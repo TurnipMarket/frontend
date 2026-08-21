@@ -158,7 +158,7 @@ export default function LoginPage() {
           </div>
 
           <p className="signup-hint">
-            ¿No tenés cuenta? <a href="#registro">Registrate</a>
+            ¿No tenés cuenta? <a href="#/registro">Registrate</a>
           </p>
 
           {MOCK_MODE && lastPayload && (

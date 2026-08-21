@@ -19,6 +19,17 @@ export const MOCK_MODE =
 // Endpoint de login relativo a API_BASE_URL (para cuando exista backend).
 export const LOGIN_ENDPOINT = '/api/auth/login';
 
+// Endpoints de registro (para cuando exista backend).
+export const REGISTER_ENDPOINT = '/api/auth/register';
+// Debería devolver { available: boolean } dado ?field=username&value=...
+export const AVAILABILITY_ENDPOINT = '/api/auth/availability';
+
+// Nombres de usuario que ya existen, solo para la simulación en mock mode.
+// Reemplazá esta lista o borrala cuando conectes el backend real.
+export const MOCK_TAKEN_USERNAMES = ['admin', 'test', 'usuario', 'soporte'];
+export const MOCK_TAKEN_EMAILS = ['ya@existe.com'];
+export const MOCK_TAKEN_PHONES = ['+5491111111111'];
+
 // Métodos de verificación / login social que se muestran como botones.
 // Agregá o sacá entradas de esta lista para editar los botones sin
 // tocar el JSX.
