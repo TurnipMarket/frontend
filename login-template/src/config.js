@@ -24,6 +24,9 @@ export const REGISTER_ENDPOINT = '/api/auth/register';
 // Debería devolver { available: boolean } dado ?field=username&value=...
 export const AVAILABILITY_ENDPOINT = '/api/auth/availability';
 
+// Endpoint de productos (catálogo público).
+export const PRODUCTS_ENDPOINT = '/api/products';
+
 // Nombres de usuario que ya existen, solo para la simulación en mock mode.
 // Reemplazá esta lista o borrala cuando conectes el backend real.
 export const MOCK_TAKEN_USERNAMES = ['admin', 'test', 'usuario', 'soporte'];

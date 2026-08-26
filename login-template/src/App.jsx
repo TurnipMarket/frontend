@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
+import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 
-// Router liviano sin dependencias: solo dos rutas (login / registro),
-// leídas del hash de la URL. Si el proyecto crece, esto es lo primero
-// que conviene reemplazar por react-router.
+// Router liviano sin dependencias: rutas leídas del hash de la URL.
+// Si el proyecto crece, esto es lo primero que conviene reemplazar
+// por react-router.
 function getRouteFromHash() {
-  return window.location.hash === '#/registro' ? 'register' : 'login';
+  const hash = window.location.hash;
+  if (hash === '#/registro') return 'register';
+  if (hash === '#/login') return 'login';
+  return 'home';
 }
 
 export default function App() {
@@ -18,5 +22,7 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
-  return route === 'register' ? <RegisterPage /> : <LoginPage />;
+  if (route === 'register') return <RegisterPage />;
+  if (route === 'login') return <LoginPage />;
+  return <HomePage />;
 }
