@@ -111,6 +111,20 @@
   background: var(--gold-soft);
 }
 
+.home__nav-user {
+  color: var(--text);
+  font-size: 0.85rem;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.home__nav-link--btn {
+  background: none;
+  border: 1px solid var(--border, currentColor);
+  cursor: pointer;
+  font: inherit;
+}
+
 /* ── Hero ── */
 .home__main {
   flex: 1;

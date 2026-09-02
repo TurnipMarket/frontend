@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import SealMark from '../components/SealMark';
 import AvailabilityStatus from '../components/AvailabilityStatus';
 import { useAvailability } from '../useAvailability';
 import { registerRequest } from '../lib/registerClient';
+import { useAuth } from '../context/AuthContext';
 import { MOCK_MODE } from '../config';
 import './LoginPage.css';
 import './RegisterPage.css';
@@ -22,6 +23,7 @@ const initialForm = {
 };
 
 export default function RegisterPage() {
+  const { register } = useAuth();
   const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
   const [feedback, setFeedback] = useState(null);
@@ -90,24 +92,39 @@ export default function RegisterPage() {
     setStatus('loading');
     setFeedback(null);
 
-    const result = await registerRequest({
-      username: form.username.trim(),
-      email: form.email.trim() || null,
-      phone: form.phone.trim() || null,
-      password: form.password,
-      verifyBy: form.verifyBy,
-    });
+    try {
+      const result = await registerRequest({
+        username: form.username.trim(),
+        email: form.email.trim() || null,
+        phone: form.phone.trim() || null,
+        password: form.password,
+        verifyBy: form.verifyBy,
+      });
 
-    setLastPayload(result.requestPayload);
+      setLastPayload(result.requestPayload);
 
-    if (result.ok) {
-      setStatus('success');
-      setFeedback(result.data?.message ?? 'Cuenta creada.');
-    } else {
+      if (result.ok) {
+        register(result.data);
+        setStatus('success');
+        setFeedback(result.data?.message ?? 'Cuenta creada.');
+      } else {
+        setStatus('error');
+        setFeedback(result.data?.message ?? 'No pudimos crear tu cuenta.');
+      }
+    } catch {
       setStatus('error');
-      setFeedback(result.data?.message ?? 'No pudimos crear tu cuenta.');
+      setFeedback('Error de conexión con el servidor.');
     }
   }
+
+  useEffect(() => {
+    if (status === 'success') {
+      const timer = setTimeout(() => {
+        window.location.hash = '#/';
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
 
   return (
     <div className="login-shell">
@@ -290,8 +307,8 @@ export default function RegisterPage() {
               <p className="field-hint field-hint--error">Tenés que aceptar los términos.</p>
             )}
 
-            <button type="submit" className="submit-btn" disabled={status === 'loading'}>
-              {status === 'loading' ? 'Creando cuenta…' : 'Crear cuenta'}
+            <button type="submit" className="submit-btn" disabled={status === 'loading' || status === 'success'}>
+              {status === 'loading' ? 'Creando cuenta…' : status === 'success' ? '¡Listo!' : 'Crear cuenta'}
             </button>
 
             {feedback && (

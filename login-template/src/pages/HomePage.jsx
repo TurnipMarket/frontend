@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import SealMark from '../components/SealMark';
 import { fetchProducts } from '../lib/productClient';
+import { useAuth } from '../context/AuthContext';
 import { MOCK_MODE } from '../config';
 import './HomePage.css';
 
@@ -11,7 +12,13 @@ function formatPrice(price, currency) {
   return `${currency} ${price.toLocaleString()}`;
 }
 
+function displayName(user) {
+  if (!user) return null;
+  return user.username || user.name || user.identifier || (user.email ? user.email.split('@')[0] : null);
+}
+
 export default function HomePage() {
+  const { user, isAuthenticated, logout } = useAuth();
   const [products, setProducts] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
   const [offline, setOffline] = useState(false);
@@ -67,8 +74,21 @@ export default function HomePage() {
             <span className="home__brand">Contactos Verificados</span>
           </a>
           <nav className="home__nav">
-            <a href="#/login" className="home__nav-link">Iniciar sesión</a>
-            <a href="#/registro" className="home__nav-link home__nav-link--accent">Registrarse</a>
+            {isAuthenticated ? (
+              <>
+                <span className="home__nav-user">
+                  Hola, {displayName(user) ?? 'usuario'}
+                </span>
+                <button type="button" className="home__nav-link home__nav-link--btn" onClick={logout}>
+                  Salir
+                </button>
+              </>
+            ) : (
+              <>
+                <a href="#/login" className="home__nav-link">Iniciar sesión</a>
+                <a href="#/registro" className="home__nav-link home__nav-link--accent">Registrarse</a>
+              </>
+            )}
           </nav>
         </div>
       </header>

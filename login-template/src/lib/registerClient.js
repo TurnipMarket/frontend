@@ -37,7 +37,12 @@ export async function checkAvailability({ field, value }) {
   }
 
   const params = new URLSearchParams({ field, value });
-  const response = await fetch(`${API_BASE_URL}${AVAILABILITY_ENDPOINT}?${params}`);
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}${AVAILABILITY_ENDPOINT}?${params}`);
+  } catch {
+    return { ok: false, available: null };
+  }
   const data = await response.json().catch(() => null);
   return { ok: response.ok, available: data?.available ?? null };
 }
@@ -92,18 +97,39 @@ export async function registerRequest({ username, email, phone, password, verify
     };
   }
 
-  const response = await fetch(`${API_BASE_URL}${REGISTER_ENDPOINT}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(requestPayload),
-  });
-
-  let data = null;
+  let response;
   try {
-    data = await response.json();
-  } catch {
-    data = null;
+    response = await fetch(`${API_BASE_URL}${REGISTER_ENDPOINT}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestPayload),
+    });
+  } catch (err) {
+    return {
+      ok: false,
+      status: 0,
+      data: { message: 'No se pudo conectar con el servidor.' },
+      requestPayload,
+    };
   }
+
+  let raw = null;
+  try {
+    raw = await response.json();
+  } catch {
+    raw = null;
+  }
+
+  const data = raw
+    ? {
+        message: raw.mensaje ?? raw.message ?? null,
+        user: raw.usuario_id
+          ? { id: raw.usuario_id, username: raw.username, email, phone, verificado: raw.verificado }
+          : raw.user ?? null,
+        token: raw.token ?? null,
+        verifyBy: raw.verifyBy ?? requestPayload.verifyBy,
+      }
+    : null;
 
   return { ok: response.ok, status: response.status, data, requestPayload };
 }
