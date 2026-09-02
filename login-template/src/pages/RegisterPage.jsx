@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import SealMark from '../components/SealMark';
 import AvailabilityStatus from '../components/AvailabilityStatus';
 import { useAvailability } from '../useAvailability';
@@ -30,14 +30,20 @@ export default function RegisterPage() {
   const [lastPayload, setLastPayload] = useState(null);
   const [touched, setTouched] = useState({});
 
+  // Memoizar las funciones validate para evitar que useAvailability
+  // se dispare innecesariamente en cada render
+  const validateUsername = useCallback((v) => USERNAME_RE.test(v), []);
+  const validateEmail = useCallback((v) => EMAIL_RE.test(v), []);
+  const validatePhone = useCallback((v) => PHONE_RE.test(v), []);
+
   const usernameStatus = useAvailability('username', form.username, {
-    validate: (v) => USERNAME_RE.test(v),
+    validate: validateUsername,
   });
   const emailStatus = useAvailability('email', form.email, {
-    validate: (v) => EMAIL_RE.test(v),
+    validate: validateEmail,
   });
   const phoneStatus = useAvailability('phone', form.phone, {
-    validate: (v) => PHONE_RE.test(v),
+    validate: validatePhone,
   });
 
   const hasContact = form.email.trim() || form.phone.trim();
