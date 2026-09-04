@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SealMark from '../components/SealMark';
 import { loginRequest } from '../lib/authClient';
+import { useAuth } from '../context/AuthContext';
 import { AUTH_PROVIDERS, MOCK_MODE } from '../config';
 import './LoginPage.css';
 
 const initialForm = { identifier: '', password: '', remember: false };
 
 export default function LoginPage() {
+  const { login } = useAuth();
   const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
   const [feedback, setFeedback] = useState(null);
@@ -22,17 +24,32 @@ export default function LoginPage() {
     setStatus('loading');
     setFeedback(null);
 
-    const result = await loginRequest(form);
-    setLastPayload(result.requestPayload);
+    try {
+      const result = await loginRequest(form);
+      setLastPayload(result.requestPayload);
 
-    if (result.ok) {
-      setStatus('success');
-      setFeedback(result.data?.message ?? 'Listo.');
-    } else {
+      if (result.ok) {
+        login(result.data);
+        setStatus('success');
+        setFeedback(result.data?.message ?? 'Listo.');
+      } else {
+        setStatus('error');
+        setFeedback(result.data?.message ?? 'No pudimos iniciar tu sesión.');
+      }
+    } catch {
       setStatus('error');
-      setFeedback(result.data?.message ?? 'No pudimos iniciar tu sesión.');
+      setFeedback('Error de conexión con el servidor.');
     }
   }
+
+  useEffect(() => {
+    if (status === 'success') {
+      const timer = setTimeout(() => {
+        window.location.hash = '#/';
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
 
   function handleProviderClick(providerId) {
     setStatus('idle');
@@ -129,8 +146,8 @@ export default function LoginPage() {
               </a>
             </div>
 
-            <button type="submit" className="submit-btn" disabled={status === 'loading'}>
-              {status === 'loading' ? 'Entrando…' : 'Entrar'}
+            <button type="submit" className="submit-btn" disabled={status === 'loading' || status === 'success'}>
+              {status === 'loading' ? 'Entrando…' : status === 'success' ? '¡Listo!' : 'Entrar'}
             </button>
 
             {feedback && (
@@ -158,7 +175,7 @@ export default function LoginPage() {
           </div>
 
           <p className="signup-hint">
-            ¿No tenés cuenta? <a href="#registro">Registrate</a>
+            ¿No tenés cuenta? <a href="#/registro">Registrate</a>
           </p>
 
           {MOCK_MODE && lastPayload && (

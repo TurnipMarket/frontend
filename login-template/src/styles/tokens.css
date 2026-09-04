@@ -11,13 +11,13 @@
   --text-muted: #8b93a6;
   --text-faint: #5c6377;
 
-  --gold: #c9a227;
+  --gold: #243E36;
   --gold-soft: rgba(201, 162, 39, 0.14);
-  --teal: #3e8e8e;
-  --teal-soft: rgba(62, 142, 142, 0.16);
+  --teal: #243e36;
+  --teal-soft: rgba(36, 62, 54, 0.16);
 
-  --danger: #e0685a;
-  --danger-soft: rgba(224, 104, 90, 0.14);
+  --danger: #A71D31;
+  --danger-soft: rgba(167, 29, 49, 0.14);
   --success: #5db088;
 
   /* ── Tipografía ── */

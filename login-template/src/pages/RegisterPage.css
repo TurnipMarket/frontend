@@ -1,0 +1,132 @@
+.register-card {
+  max-width: 440px;
+}
+
+.field-with-status {
+  position: relative;
+}
+
+.field-with-status input {
+  padding-right: 118px;
+}
+
+.availability {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.availability--checking {
+  color: var(--text-muted);
+}
+
+.availability--available {
+  color: var(--success);
+}
+
+.availability--taken,
+.availability--invalid {
+  color: var(--danger);
+}
+
+.availability__spinner {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--text-faint);
+  border-top-color: var(--text-muted);
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.field-hint {
+  margin: 6px 0 0;
+  font-size: 0.76rem;
+  color: var(--text-faint);
+}
+
+.field-hint--error {
+  color: var(--danger);
+}
+
+.field-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: -6px 0 16px;
+  color: var(--text-faint);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.field-divider::before,
+.field-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.verify-options {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.verify-option {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.verify-option:has(input:checked) {
+  border-color: var(--gold);
+  color: var(--text);
+}
+
+.verify-option input {
+  accent-color: var(--gold);
+}
+
+.terms-checkbox {
+  align-items: flex-start;
+  margin: 4px 0 22px;
+  line-height: 1.45;
+}
+
+.terms-checkbox input {
+  margin-top: 3px;
+}
+
+@media (max-width: 420px) {
+  .field-with-status input {
+    padding-right: 14px;
+  }
+
+  .availability {
+    position: static;
+    transform: none;
+    margin-top: 6px;
+  }
+}

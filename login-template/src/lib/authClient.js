@@ -57,11 +57,21 @@ export async function loginRequest({ identifier, password, remember }) {
   }
 
   // ── Modo real: pega al backend cuando exista ──
-  const response = await fetch(`${API_BASE_URL}${LOGIN_ENDPOINT}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(requestPayload),
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}${LOGIN_ENDPOINT}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestPayload),
+    });
+  } catch {
+    return {
+      ok: false,
+      status: 0,
+      data: { message: 'No se pudo conectar con el servidor.' },
+      requestPayload,
+    };
+  }
 
   let data = null;
   try {
