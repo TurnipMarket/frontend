@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   padding: 64px;
-  background: linear-gradient(160deg, #171d29 0%, #10131a 70%);
+  background: var(--brand-gradient);
   border-right: 1px solid var(--border);
   overflow: hidden;
 }
@@ -162,7 +162,7 @@
 
 .field input:focus {
   border-color: var(--gold);
-  background: #232a38;
+  background: var(--surface-focus);
 }
 
 .password-wrap {
@@ -224,7 +224,7 @@
 .submit-btn {
   width: 100%;
   background: var(--gold);
-  color: #1a1506;
+  color: var(--on-accent);
   border: none;
   border-radius: var(--radius-sm);
   padding: 13px;
@@ -256,15 +256,15 @@
 }
 
 .feedback--success {
-  background: rgba(93, 176, 136, 0.12);
+  background: var(--success-soft);
   color: var(--success);
-  border: 1px solid rgba(93, 176, 136, 0.3);
+  border: 1px solid var(--success-border);
 }
 
 .feedback--error {
   background: var(--danger-soft);
   color: var(--danger);
-  border: 1px solid rgba(224, 104, 90, 0.3);
+  border: 1px solid var(--danger-border);
 }
 
 .divider {
@@ -305,7 +305,7 @@
 
 .provider-btn:hover {
   border-color: var(--teal);
-  background: #202836;
+  background: var(--surface-hover);
 }
 
 .signup-hint {
@@ -338,12 +338,12 @@
 
 .debug-payload pre {
   margin-top: 10px;
-  background: #0d1017;
+  background: var(--code-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 12px;
   font-size: 0.75rem;
-  color: var(--teal);
+  color: var(--code-text);
   overflow-x: auto;
 }
 

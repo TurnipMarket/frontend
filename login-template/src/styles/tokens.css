@@ -1,9 +1,13 @@
 :root {
+  color-scheme: dark;
+
   /* ── Color ── */
   --bg: #10131a;
   --bg-radial: radial-gradient(120% 120% at 15% 10%, #171d29 0%, #10131a 55%);
   --surface: #171b24;
   --surface-2: #1e2430;
+  --surface-focus: #232a38;
+  --surface-hover: #202836;
   --border: rgba(237, 239, 243, 0.09);
   --border-strong: rgba(237, 239, 243, 0.18);
 
@@ -18,7 +22,19 @@
 
   --danger: #A71D31;
   --danger-soft: rgba(167, 29, 49, 0.14);
+  --danger-border: rgba(167, 29, 49, 0.3);
+  --danger-solid: #a71d31;
+  --danger-solid-hover: #8f1b2b;
+  --on-danger: #ffffff;
   --success: #5db088;
+  --success-soft: rgba(93, 176, 136, 0.14);
+  --success-border: rgba(93, 176, 136, 0.3);
+  --on-accent: #f5f7f2;
+
+  --header-bg: rgba(16, 19, 26, 0.85);
+  --brand-gradient: linear-gradient(160deg, #171d29 0%, #10131a 70%);
+  --code-bg: #0d1017;
+  --code-text: #7dd3b0;
 
   /* ── Tipografía ── */
   --font-display: 'Fraunces', Georgia, serif;
@@ -29,7 +45,49 @@
   --radius-md: 14px;
   --radius-lg: 22px;
   --shadow-card: 0 24px 60px -20px rgba(0, 0, 0, 0.55);
+  --shadow-card-hover: 0 12px 32px -12px rgba(0, 0, 0, 0.4);
   --max-width: 1080px;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --bg: #f4f6fa;
+  --bg-radial: radial-gradient(120% 120% at 15% 10%, #ffffff 0%, #edf2f7 55%, #f4f6fa 100%);
+  --surface: #ffffff;
+  --surface-2: #eef2f7;
+  --surface-focus: #e5edf4;
+  --surface-hover: #e6edf3;
+  --border: rgba(27, 39, 61, 0.12);
+  --border-strong: rgba(27, 39, 61, 0.22);
+
+  --text: #172033;
+  --text-muted: #536177;
+  --text-faint: #718096;
+
+  --gold: #1f6b55;
+  --gold-soft: rgba(31, 107, 85, 0.12);
+  --teal: #0f766e;
+  --teal-soft: rgba(15, 118, 110, 0.12);
+
+  --danger: #b4233a;
+  --danger-soft: rgba(180, 35, 58, 0.1);
+  --danger-border: rgba(180, 35, 58, 0.32);
+  --danger-solid: #b4233a;
+  --danger-solid-hover: #8f1e30;
+  --on-danger: #ffffff;
+  --success: #177a52;
+  --success-soft: rgba(23, 122, 82, 0.12);
+  --success-border: rgba(23, 122, 82, 0.3);
+  --on-accent: #ffffff;
+
+  --header-bg: rgba(255, 255, 255, 0.88);
+  --brand-gradient: linear-gradient(160deg, #eaf5f1 0%, #d8e9e3 70%);
+  --code-bg: #162235;
+  --code-text: #7dd3b0;
+
+  --shadow-card: 0 24px 60px -20px rgba(33, 48, 74, 0.18);
+  --shadow-card-hover: 0 12px 32px -12px rgba(33, 48, 74, 0.2);
 }
 
 * {

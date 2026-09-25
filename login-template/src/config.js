@@ -29,6 +29,12 @@ export const AVAILABILITY_ENDPOINT = '/api/auth/availability';
 // Endpoint de productos (catálogo público).
 export const PRODUCTS_ENDPOINT = '/api/products';
 
+// Endpoint para crear un nuevo producto.
+export const CREATE_PRODUCT_ENDPOINT = '/api/products';
+
+// Endpoint de verificación de cuenta (confirma el código enviado por email/SMS/Discord).
+export const VERIFY_ENDPOINT = '/api/auth/verify';
+
 // Nombres de usuario que ya existen, solo para la simulación en mock mode.
 // Reemplazá esta lista o borrala cuando conectes el backend real.
 export const MOCK_TAKEN_USERNAMES = ['admin', 'test', 'usuario', 'soporte'];
