@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import SealMark from '../components/SealMark';
 import AvailabilityStatus from '../components/AvailabilityStatus';
 import { useAvailability } from '../useAvailability';
@@ -23,7 +23,7 @@ const initialForm = {
 };
 
 export default function RegisterPage() {
-  const { register } = useAuth();
+  const { register, setPendingVerification } = useAuth();
   const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
   const [feedback, setFeedback] = useState(null);
@@ -111,8 +111,17 @@ export default function RegisterPage() {
 
       if (result.ok) {
         register(result.data);
+        setPendingVerification({
+          userId: result.data?.user?.id,
+          channel: form.verifyBy,
+          identifier: form.verifyBy === 'email' ? form.email.trim() : form.phone.trim(),
+        });
         setStatus('success');
         setFeedback(result.data?.message ?? 'Cuenta creada.');
+
+        setTimeout(() => {
+          window.location.hash = '#/verificar-cuenta';
+        }, 800);
       } else {
         setStatus('error');
         setFeedback(result.data?.message ?? 'No pudimos crear tu cuenta.');
@@ -122,15 +131,6 @@ export default function RegisterPage() {
       setFeedback('Error de conexión con el servidor.');
     }
   }
-
-  useEffect(() => {
-    if (status === 'success') {
-      const timer = setTimeout(() => {
-        window.location.hash = '#/';
-      }, 800);
-      return () => clearTimeout(timer);
-    }
-  }, [status]);
 
   return (
     <div className="login-shell">

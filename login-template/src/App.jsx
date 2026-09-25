@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import CreateProductPage from './pages/CreateProductPage';
+import VerifyAccountPage from './pages/VerifyAccountPage';
+import ThemeToggle from './components/ThemeToggle';
 
 // Router liviano sin dependencias: rutas leídas del hash de la URL.
 // Si el proyecto crece, esto es lo primero que conviene reemplazar
@@ -10,6 +13,8 @@ function getRouteFromHash() {
   const hash = window.location.hash;
   if (hash === '#/registro') return 'register';
   if (hash === '#/login') return 'login';
+  if (hash === '#/crear-producto') return 'create-product';
+  if (hash === '#/verificar-cuenta') return 'verify-account';
   return 'home';
 }
 
@@ -22,7 +27,17 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
-  if (route === 'register') return <RegisterPage />;
-  if (route === 'login') return <LoginPage />;
-  return <HomePage />;
+  let page;
+  if (route === 'register') page = <RegisterPage />;
+  if (route === 'login') page = <LoginPage />;
+  if (route === 'create-product') page = <CreateProductPage />;
+  if (route === 'verify-account') page = <VerifyAccountPage />;
+  if (!page) page = <HomePage />;
+
+  return (
+    <>
+      {page}
+      <ThemeToggle />
+    </>
+  );
 }
