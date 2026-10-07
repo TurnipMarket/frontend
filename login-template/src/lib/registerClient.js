@@ -7,6 +7,7 @@ import {
   MOCK_TAKEN_EMAILS,
   MOCK_TAKEN_PHONES,
 } from '../config';
+import { extractMessage } from './apiResponse';
 
 /**
  * checkAvailability({ field, value })
@@ -122,11 +123,11 @@ export async function registerRequest({ username, email, phone, password, verify
 
   const data = raw
     ? {
-        message: raw.mensaje ?? raw.message ?? null,
+        message: extractMessage(raw, response.ok ? 'Cuenta creada.' : 'No pudimos crear la cuenta.'),
         user: raw.usuario_id
           ? { id: raw.usuario_id, username: raw.username, email, phone, verificado: raw.verificado }
           : raw.user ?? null,
-        token: raw.token ?? null,
+        token: raw.token ?? raw.access_token ?? null,
         verifyBy: raw.verifyBy ?? requestPayload.verifyBy,
       }
     : null;

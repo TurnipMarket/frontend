@@ -159,6 +159,25 @@
   max-width: 48ch;
 }
 
+/* CTA de publicar, solo para usuarios con sesión */
+.home__cta {
+  display: inline-block;
+  margin-top: 24px;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  background: var(--gold);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.home__cta:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
 /* ── Loading ── */
 .home__loading {
   display: flex;

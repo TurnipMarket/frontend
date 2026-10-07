@@ -79,6 +79,11 @@ export default function HomePage() {
                 <span className="home__nav-user">
                   Hola, {displayName(user) ?? 'usuario'}
                 </span>
+                {/* Solo aparece con sesión iniciada: la ruta además
+                    está protegida en src/lib/routes.js */}
+                <a href="#/crear-producto" className="home__nav-link home__nav-link--accent">
+                  + Publicar producto
+                </a>
                 <button type="button" className="home__nav-link home__nav-link--btn" onClick={logout}>
                   Salir
                 </button>
@@ -102,6 +107,11 @@ export default function HomePage() {
           <p className="home__subtitle">
             Explorá el catálogo y contactá al vendedor directamente.
           </p>
+          {isAuthenticated && (
+            <a href="#/crear-producto" className="home__cta">
+              Publicar un producto
+            </a>
+          )}
         </section>
 
         {/* ── Estado de carga ── */}

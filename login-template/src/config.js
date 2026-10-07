@@ -9,14 +9,18 @@ const _port = import.meta.env.VITE_BACKEND_PORT || '5000';
 export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || `http://${_host}:${_port}`;
 
-// Mientras no haya backend, MOCK_MODE=true hace que el login
-// no llame a ningún servidor: solo arma el JSON y lo muestra.
-// Cuando conectes el backend real, poné esto en false
-// (o definí VITE_MOCK_MODE=false en tu .env).
+// Modo sin backend: cuando está en true, los clientes NO llaman a
+// ningún servidor y devuelven respuestas simuladas, para poder probar
+// la UI completa sin levantar el backend.
+//
+// Por defecto está en FALSE: la app pega contra el backend real.
+// Si necesitás volver al modo demo (por ejemplo, para trabajar en la
+// UI sin depender del servidor), definí VITE_MOCK_MODE=true en tu
+// .env.local — así no tocás el código.
 export const MOCK_MODE =
   import.meta.env.VITE_MOCK_MODE !== undefined
     ? import.meta.env.VITE_MOCK_MODE === 'true'
-    : true;
+    : false;
 
 // Endpoint de login relativo a API_BASE_URL (para cuando exista backend).
 export const LOGIN_ENDPOINT = '/api/auth/login';

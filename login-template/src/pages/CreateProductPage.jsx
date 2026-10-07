@@ -29,6 +29,11 @@ const CATEGORIES = [
   { id: 'other', label: '📦 Otros' },
 ];
 
+function displayName(user) {
+  if (!user) return null;
+  return user.username || user.name || user.identifier || (user.email ? user.email.split('@')[0] : null);
+}
+
 const initialForm = {
   title: '',
   description: '',
@@ -41,7 +46,7 @@ const initialForm = {
 };
 
 export default function CreateProductPage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
   const [feedback, setFeedback] = useState(null);
@@ -97,6 +102,14 @@ export default function CreateProductPage() {
     updateField('imageFile', null);
     updateField('imagePreview', null);
   }, []);
+
+  // Se vuelve al catálogo ANTES de cerrar la sesión: como esta ruta
+  // es protegida, el guard de App.jsx mandaría al login a un usuario
+  // que acaba de cerrar sesión a propósito.
+  const handleLogout = useCallback(() => {
+    window.location.hash = '#/';
+    logout();
+  }, [logout]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -191,6 +204,14 @@ export default function CreateProductPage() {
           <header className="create-product-card__header">
             <h2>Nuevo producto</h2>
             <p>Completa todos los campos para publicar.</p>
+            {/* Esta página solo se renderiza con sesión iniciada:
+                el guard de App.jsx redirige al login si no la hay. */}
+            <p className="create-product-card__session">
+              Publicando como <strong>{displayName(user) ?? 'usuario'}</strong>
+              <button type="button" onClick={handleLogout} className="create-product-card__logout">
+                Salir
+              </button>
+            </p>
           </header>
 
           <form onSubmit={handleSubmit} noValidate>

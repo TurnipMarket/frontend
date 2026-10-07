@@ -1,14 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import SealMark from '../components/SealMark';
 import { loginRequest } from '../lib/authClient';
 import { useAuth } from '../context/AuthContext';
 import { AUTH_PROVIDERS, MOCK_MODE } from '../config';
+import { parseHash, safeNext } from '../lib/routes';
 import './LoginPage.css';
 
 const initialForm = { identifier: '', password: '', remember: false };
 
 export default function LoginPage() {
   const { login } = useAuth();
+  // Si el usuario fue rebotado desde una ruta protegida, el destino
+  // original viene en ?next=. Solo se aceptan rutas internas
+  // conocidas (safeNext filtra cualquier otra cosa).
+  const nextPath = useMemo(() => safeNext(parseHash().params), []);
+  const needsAuthNotice = nextPath !== '#/';
   const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
   const [feedback, setFeedback] = useState(null);
@@ -45,11 +51,13 @@ export default function LoginPage() {
   useEffect(() => {
     if (status === 'success') {
       const timer = setTimeout(() => {
-        window.location.hash = '#/';
+        // Vuelve a donde quería ir originalmente; si entró directo
+        // al login, cae en la home.
+        window.location.hash = nextPath;
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [status]);
+  }, [status, nextPath]);
 
   function handleProviderClick(providerId) {
     setStatus('idle');
@@ -90,6 +98,11 @@ export default function LoginPage() {
           <header className="login-card__header">
             <h2>Iniciar sesión</h2>
             <p>Ingresá con tu email, teléfono o usuario verificado.</p>
+            {needsAuthNotice && (
+              <p className="auth-notice" role="status">
+                Iniciá sesión para poder publicar productos.
+              </p>
+            )}
           </header>
 
           <form onSubmit={handleSubmit} noValidate>

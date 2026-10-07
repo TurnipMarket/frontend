@@ -3,6 +3,7 @@ import {
   CREATE_PRODUCT_ENDPOINT,
   MOCK_MODE,
 } from '../config';
+import { extractMessage } from './apiResponse';
 
 /**
  * createProduct(payload)
@@ -127,7 +128,7 @@ export async function createProduct({
 
   const data = raw
     ? {
-        message: raw.mensaje ?? raw.message ?? null,
+        message: extractMessage(raw, response.ok ? 'Producto publicado.' : 'No pudimos publicar tu producto.'),
         product: raw.product
           ? {
               id: raw.product.id || raw.product_id,

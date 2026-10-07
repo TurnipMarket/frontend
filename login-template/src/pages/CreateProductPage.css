@@ -125,6 +125,42 @@
   margin: 0 0 28px;
 }
 
+/* Línea de sesión activa: quién publica + botón para salir */
+.create-product-card__header p.create-product-card__session {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -14px 0 24px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--gold-soft);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.create-product-card__session strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.create-product-card__logout {
+  margin-left: auto;
+  background: none;
+  border: none;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.create-product-card__logout:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
 /* ── Field base ── */
 .field {
   margin-bottom: 18px;
