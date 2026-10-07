@@ -132,6 +132,17 @@
   margin: 0 0 28px;
 }
 
+/* Aviso que se muestra cuando el usuario fue rebotado desde una
+   ruta protegida (ej: intentar abrir "crear producto" sin sesión) */
+.login-card__header p.auth-notice {
+  margin: -14px 0 24px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--gold);
+  background: var(--gold-soft);
+  color: var(--text);
+}
+
 .field {
   margin-bottom: 18px;
 }

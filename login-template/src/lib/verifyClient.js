@@ -1,4 +1,5 @@
 import { API_BASE_URL, VERIFY_ENDPOINT, MOCK_MODE } from '../config';
+import { extractMessage } from './apiResponse';
 
 /**
  * verifyCode({ userId, code, channel })
@@ -62,12 +63,20 @@ export async function verifyCode({ userId, code, channel }) {
     };
   }
 
-  let data = null;
+  let raw = null;
   try {
-    data = await response.json();
+    raw = await response.json();
   } catch {
-    data = null;
+    raw = null;
   }
+
+  const data = raw
+    ? {
+        ...raw,
+        message: extractMessage(raw, response.ok ? 'Cuenta verificada.' : 'No pudimos verificar la cuenta.'),
+        token: raw.token ?? raw.access_token ?? null,
+      }
+    : null;
 
   return { ok: response.ok, status: response.status, data, requestPayload };
 }

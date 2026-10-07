@@ -1,4 +1,5 @@
 import { API_BASE_URL, LOGIN_ENDPOINT, MOCK_MODE } from '../config';
+import { extractMessage } from './apiResponse';
 
 /**
  * loginRequest(payload)
@@ -73,12 +74,28 @@ export async function loginRequest({ identifier, password, remember }) {
     };
   }
 
-  let data = null;
+  let raw = null;
   try {
-    data = await response.json();
+    raw = await response.json();
   } catch {
-    data = null;
+    raw = null;
   }
+
+  // El backend no documenta el schema de respuesta del login, así que
+  // se aceptan los nombres más habituales para no romper el flujo:
+  //   token      ← token | access_token
+  //   user       ← user | usuario
+  // Sin esto, un backend que devuelva access_token dejaría al usuario
+  // sin sesión (AuthContext guardaría undefined y el guard de rutas
+  // lo expulsaría de vuelta al login).
+  const data = raw
+    ? {
+        ...raw,
+        message: extractMessage(raw, response.ok ? 'Sesión iniciada.' : 'No pudimos iniciar tu sesión.'),
+        token: raw.token ?? raw.access_token ?? null,
+        user: raw.user ?? raw.usuario ?? null,
+      }
+    : null;
 
   return { ok: response.ok, status: response.status, data, requestPayload };
 }

@@ -1,4 +1,5 @@
 import { API_BASE_URL, PRODUCTS_ENDPOINT, MOCK_MODE } from '../config';
+import { extractMessage, normalizeProducts } from './apiResponse';
 
 const MOCK_PRODUCTS = [
   {
@@ -90,12 +91,17 @@ export async function fetchProducts() {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    let data = null;
+    let raw = null;
     try {
-      data = await response.json();
+      raw = await response.json();
     } catch {
-      data = null;
+      raw = null;
     }
+
+    // El backend devuelve un array plano; la UI espera { products }.
+    const data = response.ok
+      ? normalizeProducts(raw)
+      : { message: extractMessage(raw, 'No se pudieron cargar los productos.') };
 
     return { ok: response.ok, status: response.status, data, offline: false };
   } catch {
