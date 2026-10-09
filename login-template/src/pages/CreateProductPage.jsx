@@ -46,7 +46,7 @@ const initialForm = {
 };
 
 export default function CreateProductPage() {
-  const { user, logout } = useAuth();
+  const { user, token, logout } = useAuth();
   const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
   const [feedback, setFeedback] = useState(null);
@@ -133,6 +133,9 @@ export default function CreateProductPage() {
     setFeedback(null);
 
     try {
+      // El token va aparte (segundo argumento) para que createProduct
+      // lo mande como Authorization: Bearer. Sin esto el backend no
+      // sabe quién publica el producto.
       const result = await createProduct({
         title: form.title.trim(),
         description: form.description.trim(),
@@ -141,7 +144,7 @@ export default function CreateProductPage() {
         currency: form.currency,
         condition: form.condition,
         image: form.imagePreview, // base64 o null
-      });
+      }, token);
 
       setLastPayload(result.requestPayload);
 

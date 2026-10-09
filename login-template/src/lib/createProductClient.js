@@ -6,6 +6,24 @@ import {
 import { extractMessage } from './apiResponse';
 
 /**
+ * authHeaders(token)
+ *
+ * Arma los headers de una petición autenticada. Si hay token, lo manda
+ * como Authorization: Bearer; si no, devuelve solo el Content-Type,
+ * para no enviar un header vacío que el backend pueda rechazar.
+ *
+ * Centralizado acá para que createProduct, fetchUserProducts,
+ * updateProduct y deleteProduct no armsen el header cada uno a su
+ * manera.
+ */
+function authHeaders(token) {
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
+/**
  * createProduct(payload)
  *
  * Crea un nuevo producto. En mock mode devuelve una respuesta simulada
@@ -19,6 +37,8 @@ import { extractMessage } from './apiResponse';
  *   - currency: string ('ARS', 'USD', 'UYU')
  *   - condition: string ('new', 'like_new', 'good', 'fair')
  *   - image: string|null (base64 de la imagen, opcional)
+ * @param {string|null} token - Token de sesión. Si viene, se manda como
+ *   Authorization: Bearer para que el backend sepa quién publica.
  *
  * @returns {Object} { ok, status, data, requestPayload }
  */
@@ -30,7 +50,7 @@ export async function createProduct({
   currency,
   condition,
   image,
-}) {
+}, token = null) {
   const requestPayload = {
     title,
     description,
@@ -107,7 +127,7 @@ export async function createProduct({
   try {
     response = await fetch(`${API_BASE_URL}${CREATE_PRODUCT_ENDPOINT}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders(token),
       body: JSON.stringify(requestPayload),
     });
   } catch (err) {
@@ -153,12 +173,14 @@ export async function createProduct({
 }
 
 /**
- * fetchUserProducts()
+ * fetchUserProducts(token)
  *
  * Obtiene la lista de productos publicados por el usuario autenticado.
  * Útil para mostrar "Mis productos" en una página.
+ *
+ * @param {string|null} token - Token de sesión (Authorization: Bearer).
  */
-export async function fetchUserProducts() {
+export async function fetchUserProducts(token = null) {
   if (MOCK_MODE) {
     await simulateLatency(600, 900);
     return {
@@ -203,7 +225,7 @@ export async function fetchUserProducts() {
   try {
     const response = await fetch(`${API_BASE_URL}/api/products/user`, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders(token),
     });
 
     let data = null;
