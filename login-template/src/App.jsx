@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CreateProductPage from './pages/CreateProductPage';
 import VerifyAccountPage from './pages/VerifyAccountPage';
+import ProfilePage from './pages/ProfilePage';
 import ThemeToggle from './components/ThemeToggle';
 import { useAuth } from './context/AuthContext';
 import { parseHash, loginHrefFor, isProtectedPath } from './lib/routes';
@@ -26,7 +27,7 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
-  const { route } = parseHash(hash);
+  const { route, username } = parseHash(hash);
 
   // ── Guard: ruta protegida sin sesión → al login ──
   //
@@ -60,6 +61,7 @@ export default function App() {
   else if (route === 'login') page = <LoginPage />;
   else if (route === 'create-product') page = <CreateProductPage />;
   else if (route === 'verify-account') page = <VerifyAccountPage />;
+  else if (route === 'profile' && username) page = <ProfilePage username={username} />;
   else page = <HomePage />;
 
   return (

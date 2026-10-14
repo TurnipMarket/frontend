@@ -1,26 +1,17 @@
 import { useEffect, useState } from 'react';
-import SealMark from '../components/SealMark';
 import { fetchProducts } from '../lib/productClient';
 import { useAuth } from '../context/AuthContext';
-import { MOCK_MODE } from '../config';
+import { formatPrice } from '../lib/formatters.js';
+import { Header } from '../components/layout/Header.jsx';
+import { Footer } from '../components/layout/Footer.jsx';
+import { OfflineBanner } from '../components/layout/OfflineBanner.jsx';
+import { LoadingSpinner } from '../components/layout/LoadingSpinner.jsx';
 import './HomePage.css';
-
-function formatPrice(price, currency) {
-  if (currency === 'ARS') {
-    return '$ ' + price.toLocaleString('es-AR');
-  }
-  return `${currency} ${price.toLocaleString()}`;
-}
-
-function displayName(user) {
-  if (!user) return null;
-  return user.username || user.name || user.identifier || (user.email ? user.email.split('@')[0] : null);
-}
 
 export default function HomePage() {
   const { user, isAuthenticated, logout } = useAuth();
   const [products, setProducts] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ready | error
+  const [status, setStatus] = useState('loading');
   const [offline, setOffline] = useState(false);
 
   useEffect(() => {
@@ -52,53 +43,14 @@ export default function HomePage() {
 
   return (
     <div className="home">
-      {/* ── Banner offline ── */}
-      {offline && (
-        <div className="offline-banner" role="alert">
-          <span className="offline-banner__icon" aria-hidden="true">⚠</span>
-          <div className="offline-banner__text">
-            <strong>Sin conexión con el servidor</strong>
-            <p>
-              No se pudieron cargar los productos porque el backend no está disponible.
-              {MOCK_MODE && ' Estás en modo demo (sin servidor).'}
-            </p>
-          </div>
-        </div>
-      )}
+      {offline && <OfflineBanner />}
+      
+      <Header 
+        user={user} 
+        isAuthenticated={isAuthenticated} 
+        logout={logout} 
+      />
 
-      {/* ── Header ── */}
-      <header className="home__header">
-        <div className="home__header-inner">
-          <a href="#/" className="home__logo">
-            <SealMark size={40} />
-            <span className="home__brand">Contactos Verificados</span>
-          </a>
-          <nav className="home__nav">
-            {isAuthenticated ? (
-              <>
-                <span className="home__nav-user">
-                  Hola, {displayName(user) ?? 'usuario'}
-                </span>
-                {/* Solo aparece con sesión iniciada: la ruta además
-                    está protegida en src/lib/routes.js */}
-                <a href="#/crear-producto" className="home__nav-link home__nav-link--accent">
-                  + Publicar producto
-                </a>
-                <button type="button" className="home__nav-link home__nav-link--btn" onClick={logout}>
-                  Salir
-                </button>
-              </>
-            ) : (
-              <>
-                <a href="#/login" className="home__nav-link">Iniciar sesión</a>
-                <a href="#/registro" className="home__nav-link home__nav-link--accent">Registrarse</a>
-              </>
-            )}
-          </nav>
-        </div>
-      </header>
-
-      {/* ── Contenido principal ── */}
       <main className="home__main">
         <section className="home__hero">
           <h1 className="home__title">
@@ -114,15 +66,8 @@ export default function HomePage() {
           )}
         </section>
 
-        {/* ── Estado de carga ── */}
-        {status === 'loading' && (
-          <div className="home__loading" role="status">
-            <div className="home__spinner" />
-            <p>Cargando productos…</p>
-          </div>
-        )}
+        {status === 'loading' && <LoadingSpinner message="Cargando productos…" />}
 
-        {/* ── Sin productos (offline) ── */}
         {status === 'error' && offline && (
           <div className="home__empty">
             <p>No hay productos para mostrar en este momento.</p>
@@ -139,7 +84,11 @@ export default function HomePage() {
         {status === 'ready' && products.length > 0 && (
           <div className="product-grid">
             {products.map((product) => (
-              <article key={product.id} className="product-card">
+              <a
+                key={product.id}
+                href={`#/perfil/${encodeURIComponent(product.seller)}`}
+                className="product-card"
+              >
                 <div className="product-card__image">
                   {product.image ? (
                     <img src={product.image} alt={product.title} />
@@ -154,19 +103,18 @@ export default function HomePage() {
                     <span className="product-card__price">
                       {formatPrice(product.price, product.currency)}
                     </span>
-                    <span className="product-card__seller">@{product.seller}</span>
+                    <span className="product-card__seller">
+                      @{product.seller}
+                    </span>
                   </div>
                 </div>
-              </article>
+              </a>
             ))}
           </div>
         )}
       </main>
 
-      {/* ── Footer ── */}
-      <footer className="home__footer">
-        <p>Contactos Verificados — El trato se cierra entre las partes.</p>
-      </footer>
+      <Footer />
     </div>
   );
 }
