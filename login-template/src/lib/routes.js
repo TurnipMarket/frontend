@@ -13,6 +13,7 @@ export const ROUTES = {
   '#/registro': 'register',
   '#/verificar-cuenta': 'verify-account',
   '#/crear-producto': 'create-product',
+  '#/perfil': 'profile',
 };
 
 // Rutas protegidas: SOLO accesibles con sesión iniciada.
@@ -32,6 +33,18 @@ export const PROTECTED_ROUTES = new Set(['create-product']);
 export function parseHash(hash) {
   const raw = (hash ?? window.location.hash) || '#/';
   const [path, queryString = ''] = raw.split('?');
+
+  // Maneja rutas dinámicas como #/perfil/username
+  // El path puede ser "#/perfil/juan" → partes: ["#", "perfil", "juan"]
+  const pathParts = path.split('/').filter(part => part && part !== '#');
+  if (pathParts[0] === 'perfil' && pathParts[1]) {
+    return {
+      route: 'profile',
+      path: path,
+      params: new URLSearchParams(queryString),
+      username: decodeURIComponent(pathParts[1]),
+    };
+  }
 
   return {
     route: ROUTES[path] ?? 'home',

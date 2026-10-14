@@ -230,17 +230,26 @@
 
 /* ── Product card ── */
 .product-card {
+  display: block;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   overflow: hidden;
   transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
 }
 
 .product-card:hover {
   border-color: var(--border-strong);
   transform: translateY(-2px);
   box-shadow: var(--shadow-card-hover);
+}
+
+.product-card:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .product-card__image {
@@ -297,6 +306,13 @@
 .product-card__seller {
   font-size: 0.78rem;
   color: var(--text-faint);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.product-card__seller:hover {
+  color: var(--gold);
+  text-decoration: underline;
 }
 
 /* ── Footer ── */
