@@ -39,6 +39,16 @@ export const CREATE_PRODUCT_ENDPOINT = '/api/products';
 // Endpoint de verificación de cuenta (confirma el código enviado por email/SMS/Discord).
 export const VERIFY_ENDPOINT = '/api/auth/verify';
 
+// Endpoints de chat entre usuarios.
+export const CHAT_ENDPOINTS = {
+  conversations: '/api/conversations',
+  conversation: (id) => `/api/conversations/${id}`,
+  messages: (id) => `/api/conversations/${id}/messages`,
+};
+
+// Cada cuánto el frontend consulta si hay mensajes nuevos (polling).
+export const CHAT_POLL_MS = 4000;
+
 // Nombres de usuario que ya existen, solo para la simulación en mock mode.
 // Reemplazá esta lista o borrala cuando conectes el backend real.
 export const MOCK_TAKEN_USERNAMES = ['admin', 'test', 'usuario', 'soporte'];

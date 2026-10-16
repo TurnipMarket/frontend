@@ -14,12 +14,13 @@ export const ROUTES = {
   '#/verificar-cuenta': 'verify-account',
   '#/crear-producto': 'create-product',
   '#/perfil': 'profile',
+  '#/mensajes': 'messages',
 };
 
 // Rutas protegidas: SOLO accesibles con sesión iniciada.
 // Si alguien entra sin sesión, se lo manda a #/login recordando
 // a dónde quería ir (parámetro ?next=).
-export const PROTECTED_ROUTES = new Set(['create-product']);
+export const PROTECTED_ROUTES = new Set(['create-product', 'messages']);
 
 /**
  * parseHash()
@@ -34,12 +35,13 @@ export function parseHash(hash) {
   const raw = (hash ?? window.location.hash) || '#/';
   const [path, queryString = ''] = raw.split('?');
 
-  // Maneja rutas dinámicas como #/perfil/username
-  // El path puede ser "#/perfil/juan" → partes: ["#", "perfil", "juan"]
+  // Maneja rutas dinámicas como #/perfil/username y #/mensajes/username
+  // El path puede ser "#/perfil/juan" → partes: ["perfil", "juan"]
   const pathParts = path.split('/').filter(part => part && part !== '#');
-  if (pathParts[0] === 'perfil' && pathParts[1]) {
+
+  if ((pathParts[0] === 'perfil' || pathParts[0] === 'mensajes') && pathParts[1]) {
     return {
-      route: 'profile',
+      route: pathParts[0] === 'perfil' ? 'profile' : 'messages',
       path: path,
       params: new URLSearchParams(queryString),
       username: decodeURIComponent(pathParts[1]),

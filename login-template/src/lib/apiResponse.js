@@ -55,3 +55,27 @@ export function normalizeProducts(raw) {
   if (raw && Array.isArray(raw.productos)) return { products: raw.productos };
   return { products: [] };
 }
+
+/**
+ * normalizeConversations(raw)
+ *
+ * Acepta tanto un array plano como { conversations } / { conversaciones }.
+ */
+export function normalizeConversations(raw) {
+  if (Array.isArray(raw)) return raw;
+  if (raw && Array.isArray(raw.conversations)) return raw.conversations;
+  if (raw && Array.isArray(raw.conversaciones)) return raw.conversaciones;
+  return [];
+}
+
+/**
+ * normalizeMessages(raw)
+ *
+ * Acepta tanto un array plano como { messages } / { mensajes }.
+ */
+export function normalizeMessages(raw) {
+  if (Array.isArray(raw)) return raw;
+  if (raw && Array.isArray(raw.messages)) return raw.messages;
+  if (raw && Array.isArray(raw.mensajes)) return raw.mensajes;
+  return [];
+}

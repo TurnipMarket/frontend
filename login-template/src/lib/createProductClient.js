@@ -4,24 +4,7 @@ import {
   MOCK_MODE,
 } from '../config';
 import { extractMessage } from './apiResponse';
-
-/**
- * authHeaders(token)
- *
- * Arma los headers de una petición autenticada. Si hay token, lo manda
- * como Authorization: Bearer; si no, devuelve solo el Content-Type,
- * para no enviar un header vacío que el backend pueda rechazar.
- *
- * Centralizado acá para que createProduct, fetchUserProducts,
- * updateProduct y deleteProduct no armsen el header cada uno a su
- * manera.
- */
-function authHeaders(token) {
-  return {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-}
+import { authHeaders } from './http';
 
 /**
  * createProduct(payload)
