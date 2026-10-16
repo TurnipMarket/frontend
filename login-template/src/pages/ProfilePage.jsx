@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { fetchProducts } from '../lib/productClient';
 import { useAuth } from '../context/AuthContext';
-import { formatPrice } from '../lib/formatters.js';
 import { Header } from '../components/layout/Header.jsx';
 import { Footer } from '../components/layout/Footer.jsx';
 import { OfflineBanner } from '../components/layout/OfflineBanner.jsx';
 import { LoadingSpinner } from '../components/layout/LoadingSpinner.jsx';
+import { ProductCard } from '../components/product/ProductCard.jsx';
+import { ChatButton } from '../components/chat/ChatButton.jsx';
 import './ProfilePage.css';
 
 export default function ProfilePage({ username }) {
@@ -72,6 +73,13 @@ export default function ProfilePage({ username }) {
             <p className="profile__stats">
               {products.length} {products.length === 1 ? 'publicación' : 'publicaciones'}
             </p>
+            {!isOwnProfile && (
+              <ChatButton
+                seller={username}
+                label="💬 Chatear"
+                className="profile__chat-btn"
+              />
+            )}
           </div>
         </section>
 
@@ -95,25 +103,7 @@ export default function ProfilePage({ username }) {
             <h2 className="profile__section-title">Publicaciones</h2>
             <div className="product-grid">
               {products.map((product) => (
-                <article key={product.id} className="product-card">
-                  <div className="product-card__image">
-                    {product.image ? (
-                      <img src={product.image} alt={product.title} />
-                    ) : (
-                      <span className="product-card__placeholder" aria-hidden="true">🛒</span>
-                    )}
-                  </div>
-                  <div className="product-card__body">
-                    <h3 className="product-card__title">{product.title}</h3>
-                    <p className="product-card__desc">{product.description}</p>
-                    <div className="product-card__footer">
-                      <span className="product-card__price">
-                        {formatPrice(product.price, product.currency)}
-                      </span>
-                      <span className="product-card__seller">@{product.seller}</span>
-                    </div>
-                  </div>
-                </article>
+                <ProductCard key={product.id} product={product} linkToProfile={false} />
               ))}
             </div>
           </div>

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { fetchProducts } from '../lib/productClient';
 import { useAuth } from '../context/AuthContext';
-import { formatPrice } from '../lib/formatters.js';
 import { Header } from '../components/layout/Header.jsx';
 import { Footer } from '../components/layout/Footer.jsx';
 import { OfflineBanner } from '../components/layout/OfflineBanner.jsx';
 import { LoadingSpinner } from '../components/layout/LoadingSpinner.jsx';
+import { ProductCard } from '../components/product/ProductCard.jsx';
 import './HomePage.css';
 
 export default function HomePage() {
@@ -84,31 +84,7 @@ export default function HomePage() {
         {status === 'ready' && products.length > 0 && (
           <div className="product-grid">
             {products.map((product) => (
-              <a
-                key={product.id}
-                href={`#/perfil/${encodeURIComponent(product.seller)}`}
-                className="product-card"
-              >
-                <div className="product-card__image">
-                  {product.image ? (
-                    <img src={product.image} alt={product.title} />
-                  ) : (
-                    <span className="product-card__placeholder" aria-hidden="true">🛒</span>
-                  )}
-                </div>
-                <div className="product-card__body">
-                  <h3 className="product-card__title">{product.title}</h3>
-                  <p className="product-card__desc">{product.description}</p>
-                  <div className="product-card__footer">
-                    <span className="product-card__price">
-                      {formatPrice(product.price, product.currency)}
-                    </span>
-                    <span className="product-card__seller">
-                      @{product.seller}
-                    </span>
-                  </div>
-                </div>
-              </a>
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         )}

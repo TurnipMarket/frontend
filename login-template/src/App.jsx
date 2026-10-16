@@ -5,6 +5,8 @@ import RegisterPage from './pages/RegisterPage';
 import CreateProductPage from './pages/CreateProductPage';
 import VerifyAccountPage from './pages/VerifyAccountPage';
 import ProfilePage from './pages/ProfilePage';
+import MessagesPage from './pages/MessagesPage';
+import { ChatProvider } from './context/ChatContext';
 import ThemeToggle from './components/ThemeToggle';
 import { useAuth } from './context/AuthContext';
 import { parseHash, loginHrefFor, isProtectedPath } from './lib/routes';
@@ -62,12 +64,13 @@ export default function App() {
   else if (route === 'create-product') page = <CreateProductPage />;
   else if (route === 'verify-account') page = <VerifyAccountPage />;
   else if (route === 'profile' && username) page = <ProfilePage username={username} />;
+  else if (route === 'messages') page = <MessagesPage username={username} />;
   else page = <HomePage />;
 
   return (
-    <>
+    <ChatProvider>
       {page}
       <ThemeToggle />
-    </>
+    </ChatProvider>
   );
 }
