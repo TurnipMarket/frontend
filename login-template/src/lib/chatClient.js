@@ -1,5 +1,9 @@
 import { API_BASE_URL, CHAT_ENDPOINTS, MOCK_MODE } from '../config';
-import { extractMessage, normalizeConversations, normalizeMessages } from './apiResponse';
+import {
+  extractMessage,
+  normalizeConversations,
+  normalizeMessages,
+} from './apiResponse';
 import { authHeaders, originMeta } from './http';
 import {
   listConversations,
@@ -8,128 +12,278 @@ import {
   createConversation,
 } from './chatMock';
 
-/**
- * Cliente de chat.
- *
- * Sigue el mismo contrato que productClient: cada función devuelve
- * { ok, status, data, offline } (y a veces requestPayload), de modo que
- * la UI nunca tiene que saber si está hablando con el backend real o
- * con los datos simulados.
- *
- * Los endpoints esperados del backend real:
- *   GET    /api/conversations                         → lista de conversaciones
- *   POST   /api/conversations                         → crea/encuentra una conversación
- *   GET    /api/conversations/:id/messages            → mensajes de una conversación
- *   POST   /api/conversations/:id/messages            → envía un mensaje
- */
-
 function simulateLatency(min = 250, max = 600) {
   const ms = min + Math.random() * (max - min);
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function offlineResult(message = 'No se pudo conectar con el servidor.') {
-  return { ok: false, status: 0, data: { error: 'network_error', message }, offline: true };
+  return {
+    ok: false,
+    status: 0,
+    data: { error: 'network_error', message },
+    offline: true,
+  };
 }
 
-/**
- * fetchConversations({ token, username })
- *
- * Lista las conversaciones del usuario autenticado.
- */
+async function requestJson(url, options = {}) {
+  let response;
+
+  try {
+    response = await fetch(url, options);
+  } catch {
+    return offlineResult();
+  }
+
+  const raw = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    return {
+      ok: false,
+      status: response.status,
+      data: {
+        error: raw?.error ?? 'request_failed',
+        message: extractMessage(
+          raw,
+          'El servidor no pudo completar la solicitud.'
+        ),
+      },
+      offline: false,
+    };
+  }
+
+  return {
+    ok: true,
+    status: response.status,
+    data: raw,
+    offline: false,
+  };
+}
+
+function normalizeMessage(message, conversationId) {
+  if (!message || typeof message !== 'object') return null;
+
+  const id = message.id;
+  const text = message.text ?? message.contenido;
+  const sender = message.sender ?? message.senderUsername;
+  const createdAt = message.createdAt ?? message.created_at;
+
+  if (
+    id == null ||
+    typeof text !== 'string' ||
+    typeof sender !== 'string' ||
+    !createdAt
+  ) {
+    return null;
+  }
+
+  return {
+    ...message,
+    id: String(id),
+    conversationId: String(message.conversationId ?? conversationId),
+    text,
+    sender,
+    createdAt,
+    read: Boolean(message.read),
+  };
+}
+
+function normalizeConversation(conversation) {
+  if (!conversation || typeof conversation !== 'object') return null;
+
+  if (conversation.id == null) return null;
+
+  const buyer = conversation.buyer;
+  const seller = conversation.seller;
+
+  if (typeof buyer !== 'string' || typeof seller !== 'string') {
+    return null;
+  }
+
+  return {
+    ...conversation,
+    id: String(conversation.id),
+    buyer,
+    seller,
+    productId: conversation.productId ?? null,
+    productTitle: conversation.productTitle ?? null,
+    otherUser: conversation.otherUser ?? {
+      username: seller,
+    },
+    lastMessage: conversation.lastMessage ?? '',
+    lastMessageAt: conversation.lastMessageAt ?? null,
+    unreadCount: Number(conversation.unreadCount ?? 0),
+  };
+}
+
 export async function fetchConversations({ token, username }) {
   if (MOCK_MODE) {
     await simulateLatency();
+
     return {
       ok: true,
       status: 200,
-      data: { conversations: listConversations(username) },
+      data: {
+        conversations: listConversations(username)
+          .map(normalizeConversation)
+          .filter(Boolean),
+      },
       offline: false,
     };
   }
 
-  try {
-    const response = await fetch(`${API_BASE_URL}${CHAT_ENDPOINTS.conversations}`, {
+  const result = await requestJson(
+    `${API_BASE_URL}${CHAT_ENDPOINTS.conversations}`,
+    {
       method: 'GET',
       headers: authHeaders(token),
-    });
-    const raw = await response.json().catch(() => null);
-    const data = response.ok
-      ? { conversations: normalizeConversations(raw) }
-      : { message: extractMessage(raw, 'No se pudieron cargar las conversaciones.') };
-    return { ok: response.ok, status: response.status, data, offline: false };
-  } catch {
-    return offlineResult();
-  }
+    }
+  );
+
+  if (!result.ok) return result;
+
+  return {
+    ...result,
+    data: {
+      conversations: normalizeConversations(result.data)
+        .map(normalizeConversation)
+        .filter(Boolean),
+    },
+  };
 }
 
-/**
- * fetchMessages({ conversationId, token, username })
- *
- * Lista los mensajes de una conversación, en orden cronológico.
- */
-export async function fetchMessages({ conversationId, token, username }) {
+export async function fetchMessages({
+  conversationId,
+  token,
+  username,
+}) {
   if (MOCK_MODE) {
     await simulateLatency();
+
     return {
       ok: true,
       status: 200,
-      data: { messages: listMessages(conversationId, username) },
+      data: {
+        messages: listMessages(conversationId, username)
+          .map((message) => normalizeMessage(message, conversationId))
+          .filter(Boolean),
+      },
       offline: false,
     };
   }
 
-  try {
-    const response = await fetch(`${API_BASE_URL}${CHAT_ENDPOINTS.messages(conversationId)}`, {
+  const result = await requestJson(
+    `${API_BASE_URL}${CHAT_ENDPOINTS.messages(conversationId)}`,
+    {
       method: 'GET',
       headers: authHeaders(token),
-    });
-    const raw = await response.json().catch(() => null);
-    const data = response.ok
-      ? { messages: normalizeMessages(raw) }
-      : { message: extractMessage(raw, 'No se pudieron cargar los mensajes.') };
-    return { ok: response.ok, status: response.status, data, offline: false };
-  } catch {
-    return offlineResult();
-  }
+    }
+  );
+
+  if (!result.ok) return result;
+
+  return {
+    ...result,
+    data: {
+      messages: normalizeMessages(result.data)
+        .map((message) => normalizeMessage(message, conversationId))
+        .filter(Boolean)
+        .sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() -
+            new Date(b.createdAt).getTime()
+        ),
+    },
+  };
 }
 
-/**
- * sendMessage({ conversationId, text, token, username })
- *
- * Envía un mensaje a una conversación existente.
- */
-export async function sendMessage({ conversationId, text, token, username }) {
-  const requestPayload = { text, ...originMeta() };
+export async function sendMessage({
+  conversationId,
+  text,
+  token,
+  username,
+}) {
+  const trimmed = text.trim();
+
+  if (!trimmed || trimmed.length > 1000) {
+    return {
+      ok: false,
+      status: 422,
+      data: {
+        message: 'El mensaje debe tener entre 1 y 1000 caracteres.',
+      },
+      offline: false,
+    };
+  }
+
+  const requestPayload = {
+    text: trimmed,
+    ...originMeta(),
+  };
 
   if (MOCK_MODE) {
     await simulateLatency(150, 400);
-    const message = createMessage(conversationId, text, username);
-    return { ok: true, status: 201, data: { message }, requestPayload };
+
+    const message = normalizeMessage(
+      createMessage(conversationId, trimmed, username),
+      conversationId
+    );
+
+    if (!message) {
+      return {
+        ok: false,
+        status: 500,
+        data: { message: 'El mensaje simulado no es válido.' },
+        offline: false,
+      };
+    }
+
+    return {
+      ok: true,
+      status: 201,
+      data: { message },
+      requestPayload,
+      offline: false,
+    };
   }
 
-  try {
-    const response = await fetch(`${API_BASE_URL}${CHAT_ENDPOINTS.messages(conversationId)}`, {
+  const result = await requestJson(
+    `${API_BASE_URL}${CHAT_ENDPOINTS.messages(conversationId)}`,
+    {
       method: 'POST',
       headers: authHeaders(token),
       body: JSON.stringify(requestPayload),
-    });
-    const raw = await response.json().catch(() => null);
-    const data = raw
-      ? { ...raw, message: raw.message ?? raw.mensaje ?? null }
-      : { message: extractMessage(raw, 'No se pudo enviar el mensaje.') };
-    return { ok: response.ok, status: response.status, data, requestPayload };
-  } catch {
-    return offlineResult();
+    }
+  );
+
+  if (!result.ok) {
+    return { ...result, requestPayload };
   }
+
+  const message = normalizeMessage(
+    result.data?.message ?? result.data?.mensaje,
+    conversationId
+  );
+
+  if (!message) {
+    return {
+      ok: false,
+      status: result.status,
+      data: {
+        message: 'El servidor devolvió un mensaje con formato inválido.',
+      },
+      requestPayload,
+      offline: false,
+    };
+  }
+
+  return {
+    ...result,
+    data: { message },
+    requestPayload,
+  };
 }
 
-/**
- * startConversation({ seller, productId, productTitle, token, username })
- *
- * Busca (o crea) la conversación entre el usuario actual y un vendedor.
- * Devuelve { conversation }.
- */
 export async function startConversation({
   seller,
   productId = null,
@@ -137,31 +291,109 @@ export async function startConversation({
   token,
   username,
 }) {
-  const requestPayload = { seller, productId, productTitle, ...originMeta() };
+  if (!seller || seller === username) {
+    return {
+      ok: false,
+      status: 422,
+      data: {
+        message: 'No podés iniciar una conversación con vos mismo.',
+      },
+      offline: false,
+    };
+  }
+
+  const requestPayload = {
+    seller,
+    productId,
+    productTitle,
+    ...originMeta(),
+  };
 
   if (MOCK_MODE) {
     await simulateLatency(250, 500);
-    const conversation = createConversation({
-      seller,
-      productId,
-      productTitle,
-      buyer: username,
-    });
-    return { ok: true, status: 201, data: { conversation }, requestPayload };
+
+    const conversation = normalizeConversation(
+      createConversation({
+        seller,
+        productId,
+        productTitle,
+        buyer: username,
+      })
+    );
+
+    if (!conversation) {
+      return {
+        ok: false,
+        status: 500,
+        data: { message: 'No se pudo crear la conversación simulada.' },
+        offline: false,
+      };
+    }
+
+    return {
+      ok: true,
+      status: 201,
+      data: { conversation },
+      requestPayload,
+      offline: false,
+    };
   }
 
-  try {
-    const response = await fetch(`${API_BASE_URL}${CHAT_ENDPOINTS.conversations}`, {
+  const result = await requestJson(
+    `${API_BASE_URL}${CHAT_ENDPOINTS.conversations}`,
+    {
       method: 'POST',
       headers: authHeaders(token),
       body: JSON.stringify(requestPayload),
-    });
-    const raw = await response.json().catch(() => null);
-    const data = raw
-      ? { ...raw, conversation: raw.conversation ?? raw.conversacion ?? null }
-      : { message: extractMessage(raw, 'No se pudo iniciar la conversación.') };
-    return { ok: response.ok, status: response.status, data, requestPayload };
-  } catch {
-    return offlineResult();
+    }
+  );
+
+  if (!result.ok) {
+    return { ...result, requestPayload };
   }
+
+  const conversation = normalizeConversation(
+    result.data?.conversation ?? result.data?.conversacion
+  );
+
+  if (!conversation) {
+    return {
+      ok: false,
+      status: result.status,
+      data: {
+        message: 'El servidor devolvió una conversación con formato inválido.',
+      },
+      requestPayload,
+      offline: false,
+    };
+  }
+
+  return {
+    ...result,
+    data: { conversation },
+    requestPayload,
+  };
+}
+
+export async function markConversationRead({
+  conversationId,
+  token,
+}) {
+  if (MOCK_MODE) {
+    return {
+      ok: true,
+      status: 200,
+      data: { success: true },
+      offline: false,
+    };
+  }
+
+  return requestJson(
+    `${API_BASE_URL}${CHAT_ENDPOINTS.read(conversationId)}`,
+    {
+      method: 'POST',
+      headers: authHeaders(token),
+      body: JSON.stringify({}),
+    }
+  );
 }

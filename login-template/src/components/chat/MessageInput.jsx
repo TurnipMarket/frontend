@@ -1,21 +1,37 @@
 import { useState } from 'react';
 
-/**
- * MessageInput
- *
- * Caja de texto para escribir y enviar un mensaje (Enter o botón).
- * No conoce el backend: solo llama a onSend con el texto.
- */
 export function MessageInput({ onSend, disabled = false }) {
   const [text, setText] = useState('');
+  const [sending, setSending] = useState(false);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+
     const value = text.trim();
-    if (!value || disabled) return;
-    onSend(value);
-    setText('');
+
+    if (
+      !value ||
+      disabled ||
+      sending ||
+      value.length > 1000
+    ) {
+      return;
+    }
+
+    setSending(true);
+
+    try {
+      const sent = await onSend(value);
+
+      if (sent) {
+        setText('');
+      }
+    } finally {
+      setSending(false);
+    }
   }
+
+  const isDisabled = disabled || sending;
 
   return (
     <form className="message-input" onSubmit={handleSubmit}>
@@ -25,17 +41,18 @@ export function MessageInput({ onSend, disabled = false }) {
         placeholder="Escribí un mensaje…"
         value={text}
         onChange={(event) => setText(event.target.value)}
-        disabled={disabled}
+        disabled={isDisabled}
         maxLength={1000}
         aria-label="Mensaje"
       />
+
       <button
         type="submit"
         className="message-input__send"
-        disabled={disabled || !text.trim()}
+        disabled={isDisabled || !text.trim()}
         aria-label="Enviar mensaje"
       >
-        Enviar
+        {sending ? 'Enviando…' : 'Enviar'}
       </button>
     </form>
   );
