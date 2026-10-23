@@ -1,5 +1,6 @@
 import { API_BASE_URL, VERIFY_ENDPOINT, MOCK_MODE } from '../config';
-import { extractMessage } from './apiResponse';
+import { simulateLatency } from './delay';
+import { postJson } from './http';
 
 /**
  * verifyCode({ userId, code, channel })
@@ -47,41 +48,18 @@ export async function verifyCode({ userId, code, channel }) {
     };
   }
 
-  let response;
-  try {
-    response = await fetch(`${API_BASE_URL}${VERIFY_ENDPOINT}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestPayload),
-    });
-  } catch {
-    return {
-      ok: false,
-      status: 0,
-      data: { message: 'No se pudo conectar con el servidor.' },
-      requestPayload,
-    };
-  }
+  const result = await postJson(`${API_BASE_URL}${VERIFY_ENDPOINT}`, requestPayload, {
+    successMessage: 'Cuenta verificada.',
+    failureMessage: 'No pudimos verificar la cuenta.',
+  });
 
-  let raw = null;
-  try {
-    raw = await response.json();
-  } catch {
-    raw = null;
-  }
+  if (!result.ok || !result.data) return result;
 
-  const data = raw
-    ? {
-        ...raw,
-        message: extractMessage(raw, response.ok ? 'Cuenta verificada.' : 'No pudimos verificar la cuenta.'),
-        token: raw.token ?? raw.access_token ?? null,
-      }
-    : null;
-
-  return { ok: response.ok, status: response.status, data, requestPayload };
-}
-
-function simulateLatency(min = 400, max = 800) {
-  const ms = min + Math.random() * (max - min);
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return {
+    ...result,
+    data: {
+      ...result.data,
+      token: result.data.token ?? result.data.access_token ?? null,
+    },
+  };
 }

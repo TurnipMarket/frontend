@@ -1,8 +1,11 @@
+import { extractMessage } from './apiResponse';
+
 /**
  * Helpers HTTP compartidos por todos los clientes del backend.
  *
  * Centralizado acá para que los clientes (auth, products, chat) no arman
- * el header de autorización cada uno a su manera.
+ * el header de autorización ni repitan el manejo de errores cada uno a
+ * su manera.
  */
 
 /**
@@ -22,8 +25,7 @@ export function authHeaders(token) {
 /**
  * originMeta()
  *
- * Metadata mínima del cliente que se adjunta a las peticiones, igual que
- * hacen authClient y createProductClient.
+ * Metadata mínima del cliente que se adjunta a las peticiones.
  */
 export function originMeta() {
   return {
@@ -31,5 +33,91 @@ export function originMeta() {
       origin: typeof window !== 'undefined' ? window.location.origin : 'local',
       timestamp: new Date().toISOString(),
     },
+  };
+}
+
+export function networkError(message = 'No se pudo conectar con el servidor.') {
+  return {
+    ok: false,
+    status: 0,
+    data: { error: 'network_error', message },
+    offline: true,
+  };
+}
+
+/**
+ * requestJson(url, options)
+ *
+ * Hace un fetch y normaliza el resultado a { ok, status, data, offline }.
+ */
+export async function requestJson(url, options = {}) {
+  let response;
+
+  try {
+    response = await fetch(url, options);
+  } catch {
+    return networkError();
+  }
+
+  const raw = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    return {
+      ok: false,
+      status: response.status,
+      data: {
+        error: raw?.error ?? 'request_failed',
+        message: extractMessage(raw, 'El servidor no pudo completar la solicitud.'),
+      },
+      offline: false,
+    };
+  }
+
+  return { ok: true, status: response.status, data: raw, offline: false };
+}
+
+/**
+ * postJson(url, payload, options)
+ *
+ * POST genérico con manejo de red, parseo y mensaje por defecto.
+ * Devuelve { ok, status, data, requestPayload, offline }.
+ */
+export async function postJson(
+  url,
+  payload,
+  { token = null, successMessage = null, failureMessage = null } = {},
+) {
+  let response;
+
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: authHeaders(token),
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    return {
+      ok: false,
+      status: 0,
+      data: { message: 'No se pudo conectar con el servidor.' },
+      requestPayload: payload,
+      offline: true,
+    };
+  }
+
+  const raw = await response.json().catch(() => null);
+  const data = raw
+    ? {
+        ...raw,
+        message: extractMessage(raw, response.ok ? successMessage : failureMessage),
+      }
+    : null;
+
+  return {
+    ok: response.ok,
+    status: response.status,
+    data,
+    requestPayload: payload,
+    offline: false,
   };
 }

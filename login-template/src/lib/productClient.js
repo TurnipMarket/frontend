@@ -1,5 +1,7 @@
 import { API_BASE_URL, PRODUCTS_ENDPOINT, MOCK_MODE } from '../config';
-import { extractMessage, normalizeProducts } from './apiResponse';
+import { normalizeProducts } from './apiResponse';
+import { simulateLatency } from './delay';
+import { authHeaders, requestJson } from './http';
 
 const MOCK_PRODUCTS = [
   {
@@ -69,14 +71,13 @@ const MOCK_PRODUCTS = [
  *
  * Devuelve la lista de productos del catálogo público.
  * En MOCK_MODE devuelve datos de ejemplo sin llamar al backend.
- * Cuando el backend esté disponible, hace un GET real.
  *
  * Devuelve { ok, status, data, offline }
  * - offline = true cuando el backend no responde (fetch falló).
  */
 export async function fetchProducts() {
   if (MOCK_MODE) {
-    await simulateLatency();
+    await simulateLatency(400, 600);
     return {
       ok: true,
       status: 200,
@@ -85,36 +86,13 @@ export async function fetchProducts() {
     };
   }
 
-  try {
-    const response = await fetch(`${API_BASE_URL}${PRODUCTS_ENDPOINT}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
+  const result = await requestJson(`${API_BASE_URL}${PRODUCTS_ENDPOINT}`, {
+    method: 'GET',
+    headers: authHeaders(null),
+  });
 
-    let raw = null;
-    try {
-      raw = await response.json();
-    } catch {
-      raw = null;
-    }
+  if (!result.ok) return result;
 
-    // El backend devuelve un array plano; la UI espera { products }.
-    const data = response.ok
-      ? normalizeProducts(raw)
-      : { message: extractMessage(raw, 'No se pudieron cargar los productos.') };
-
-    return { ok: response.ok, status: response.status, data, offline: false };
-  } catch {
-    return {
-      ok: false,
-      status: 0,
-      data: { error: 'network_error', message: 'No se pudo conectar con el servidor.' },
-      offline: true,
-    };
-  }
-}
-
-function simulateLatency() {
-  const ms = 400 + Math.random() * 600;
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  // El backend devuelve un array plano; la UI espera { products }.
+  return { ...result, data: normalizeProducts(result.data) };
 }

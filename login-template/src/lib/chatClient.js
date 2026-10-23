@@ -1,10 +1,10 @@
 import { API_BASE_URL, CHAT_ENDPOINTS, MOCK_MODE } from '../config';
 import {
-  extractMessage,
   normalizeConversations,
   normalizeMessages,
 } from './apiResponse';
-import { authHeaders, originMeta } from './http';
+import { simulateLatency } from './delay';
+import { authHeaders, originMeta, requestJson } from './http';
 import {
   listConversations,
   listMessages,
@@ -12,64 +12,19 @@ import {
   createConversation,
 } from './chatMock';
 
-function simulateLatency(min = 250, max = 600) {
-  const ms = min + Math.random() * (max - min);
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function offlineResult(message = 'No se pudo conectar con el servidor.') {
-  return {
-    ok: false,
-    status: 0,
-    data: { error: 'network_error', message },
-    offline: true,
-  };
-}
-
-async function requestJson(url, options = {}) {
-  let response;
-
-  try {
-    response = await fetch(url, options);
-  } catch {
-    return offlineResult();
-  }
-
-  const raw = await response.json().catch(() => null);
-
-  if (!response.ok) {
-    return {
-      ok: false,
-      status: response.status,
-      data: {
-        error: raw?.error ?? 'request_failed',
-        message: extractMessage(
-          raw,
-          'El servidor no pudo completar la solicitud.'
-        ),
-      },
-      offline: false,
-    };
-  }
-
-  return {
-    ok: true,
-    status: response.status,
-    data: raw,
-    offline: false,
-  };
+function normalizeList(items, normalize) {
+  return items.map(normalize).filter(Boolean);
 }
 
 function normalizeMessage(message, conversationId) {
   if (!message || typeof message !== 'object') return null;
 
-  const id = message.id;
   const text = message.text ?? message.contenido;
   const sender = message.sender ?? message.senderUsername;
   const createdAt = message.createdAt ?? message.created_at;
 
   if (
-    id == null ||
+    message.id == null ||
     typeof text !== 'string' ||
     typeof sender !== 'string' ||
     !createdAt
@@ -79,7 +34,7 @@ function normalizeMessage(message, conversationId) {
 
   return {
     ...message,
-    id: String(id),
+    id: String(message.id),
     conversationId: String(message.conversationId ?? conversationId),
     text,
     sender,
@@ -93,8 +48,7 @@ function normalizeConversation(conversation) {
 
   if (conversation.id == null) return null;
 
-  const buyer = conversation.buyer;
-  const seller = conversation.seller;
+  const { buyer, seller } = conversation;
 
   if (typeof buyer !== 'string' || typeof seller !== 'string') {
     return null;
@@ -107,9 +61,7 @@ function normalizeConversation(conversation) {
     seller,
     productId: conversation.productId ?? null,
     productTitle: conversation.productTitle ?? null,
-    otherUser: conversation.otherUser ?? {
-      username: seller,
-    },
+    otherUser: conversation.otherUser ?? { username: seller },
     lastMessage: conversation.lastMessage ?? '',
     lastMessageAt: conversation.lastMessageAt ?? null,
     unreadCount: Number(conversation.unreadCount ?? 0),
@@ -119,14 +71,14 @@ function normalizeConversation(conversation) {
 export async function fetchConversations({ token, username }) {
   if (MOCK_MODE) {
     await simulateLatency();
-
     return {
       ok: true,
       status: 200,
       data: {
-        conversations: listConversations(username)
-          .map(normalizeConversation)
-          .filter(Boolean),
+        conversations: normalizeList(
+          listConversations(username),
+          normalizeConversation,
+        ),
       },
       offline: false,
     };
@@ -134,10 +86,7 @@ export async function fetchConversations({ token, username }) {
 
   const result = await requestJson(
     `${API_BASE_URL}${CHAT_ENDPOINTS.conversations}`,
-    {
-      method: 'GET',
-      headers: authHeaders(token),
-    }
+    { method: 'GET', headers: authHeaders(token) },
   );
 
   if (!result.ok) return result;
@@ -145,28 +94,25 @@ export async function fetchConversations({ token, username }) {
   return {
     ...result,
     data: {
-      conversations: normalizeConversations(result.data)
-        .map(normalizeConversation)
-        .filter(Boolean),
+      conversations: normalizeList(
+        normalizeConversations(result.data),
+        normalizeConversation,
+      ),
     },
   };
 }
 
-export async function fetchMessages({
-  conversationId,
-  token,
-  username,
-}) {
+export async function fetchMessages({ conversationId, token, username }) {
   if (MOCK_MODE) {
     await simulateLatency();
-
     return {
       ok: true,
       status: 200,
       data: {
-        messages: listMessages(conversationId, username)
-          .map((message) => normalizeMessage(message, conversationId))
-          .filter(Boolean),
+        messages: normalizeList(
+          listMessages(conversationId, username),
+          (message) => normalizeMessage(message, conversationId),
+        ),
       },
       offline: false,
     };
@@ -174,10 +120,7 @@ export async function fetchMessages({
 
   const result = await requestJson(
     `${API_BASE_URL}${CHAT_ENDPOINTS.messages(conversationId)}`,
-    {
-      method: 'GET',
-      headers: authHeaders(token),
-    }
+    { method: 'GET', headers: authHeaders(token) },
   );
 
   if (!result.ok) return result;
@@ -185,14 +128,13 @@ export async function fetchMessages({
   return {
     ...result,
     data: {
-      messages: normalizeMessages(result.data)
-        .map((message) => normalizeMessage(message, conversationId))
-        .filter(Boolean)
-        .sort(
-          (a, b) =>
-            new Date(a.createdAt).getTime() -
-            new Date(b.createdAt).getTime()
-        ),
+      messages: normalizeList(
+        normalizeMessages(result.data),
+        (message) => normalizeMessage(message, conversationId),
+      ).sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      ),
     },
   };
 }
@@ -216,17 +158,14 @@ export async function sendMessage({
     };
   }
 
-  const requestPayload = {
-    text: trimmed,
-    ...originMeta(),
-  };
+  const requestPayload = { text: trimmed, ...originMeta() };
 
   if (MOCK_MODE) {
     await simulateLatency(150, 400);
 
     const message = normalizeMessage(
       createMessage(conversationId, trimmed, username),
-      conversationId
+      conversationId,
     );
 
     if (!message) {
@@ -253,16 +192,14 @@ export async function sendMessage({
       method: 'POST',
       headers: authHeaders(token),
       body: JSON.stringify(requestPayload),
-    }
+    },
   );
 
-  if (!result.ok) {
-    return { ...result, requestPayload };
-  }
+  if (!result.ok) return { ...result, requestPayload };
 
   const message = normalizeMessage(
     result.data?.message ?? result.data?.mensaje,
-    conversationId
+    conversationId,
   );
 
   if (!message) {
@@ -277,11 +214,7 @@ export async function sendMessage({
     };
   }
 
-  return {
-    ...result,
-    data: { message },
-    requestPayload,
-  };
+  return { ...result, data: { message }, requestPayload };
 }
 
 export async function startConversation({
@@ -318,7 +251,7 @@ export async function startConversation({
         productId,
         productTitle,
         buyer: username,
-      })
+      }),
     );
 
     if (!conversation) {
@@ -345,15 +278,13 @@ export async function startConversation({
       method: 'POST',
       headers: authHeaders(token),
       body: JSON.stringify(requestPayload),
-    }
+    },
   );
 
-  if (!result.ok) {
-    return { ...result, requestPayload };
-  }
+  if (!result.ok) return { ...result, requestPayload };
 
   const conversation = normalizeConversation(
-    result.data?.conversation ?? result.data?.conversacion
+    result.data?.conversation ?? result.data?.conversacion,
   );
 
   if (!conversation) {
@@ -368,17 +299,10 @@ export async function startConversation({
     };
   }
 
-  return {
-    ...result,
-    data: { conversation },
-    requestPayload,
-  };
+  return { ...result, data: { conversation }, requestPayload };
 }
 
-export async function markConversationRead({
-  conversationId,
-  token,
-}) {
+export async function markConversationRead({ conversationId, token }) {
   if (MOCK_MODE) {
     return {
       ok: true,
@@ -394,6 +318,6 @@ export async function markConversationRead({
       method: 'POST',
       headers: authHeaders(token),
       body: JSON.stringify({}),
-    }
+    },
   );
 }

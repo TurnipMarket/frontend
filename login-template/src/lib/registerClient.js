@@ -7,7 +7,8 @@ import {
   MOCK_TAKEN_EMAILS,
   MOCK_TAKEN_PHONES,
 } from '../config';
-import { extractMessage } from './apiResponse';
+import { simulateLatency } from './delay';
+import { postJson } from './http';
 
 /**
  * checkAvailability({ field, value })
@@ -18,7 +19,6 @@ import { extractMessage } from './apiResponse';
  * ⚠️ La unicidad REAL solo la puede garantizar el backend (es el único
  * que ve toda la base de usuarios). Acá solo simulamos el resultado
  * contra listas fijas en config.js para poder probar la UI.
- * Cuando MOCK_MODE=false, esto pega a AVAILABILITY_ENDPOINT.
  */
 export async function checkAvailability({ field, value }) {
   if (!value || !value.trim()) {
@@ -98,44 +98,29 @@ export async function registerRequest({ username, email, phone, password, verify
     };
   }
 
-  let response;
-  try {
-    response = await fetch(`${API_BASE_URL}${REGISTER_ENDPOINT}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestPayload),
-    });
-  } catch (err) {
-    return {
-      ok: false,
-      status: 0,
-      data: { message: 'No se pudo conectar con el servidor.' },
-      requestPayload,
-    };
-  }
+  const result = await postJson(`${API_BASE_URL}${REGISTER_ENDPOINT}`, requestPayload, {
+    successMessage: 'Cuenta creada.',
+    failureMessage: 'No pudimos crear la cuenta.',
+  });
 
-  let raw = null;
-  try {
-    raw = await response.json();
-  } catch {
-    raw = null;
-  }
+  if (!result.ok || !result.data) return result;
 
-  const data = raw
-    ? {
-        message: extractMessage(raw, response.ok ? 'Cuenta creada.' : 'No pudimos crear la cuenta.'),
-        user: raw.usuario_id
-          ? { id: raw.usuario_id, username: raw.username, email, phone, verificado: raw.verificado }
-          : raw.user ?? null,
-        token: raw.token ?? raw.access_token ?? null,
-        verifyBy: raw.verifyBy ?? requestPayload.verifyBy,
-      }
-    : null;
-
-  return { ok: response.ok, status: response.status, data, requestPayload };
-}
-
-function simulateLatency(min = 400, max = 800) {
-  const ms = min + Math.random() * (max - min);
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  const raw = result.data;
+  return {
+    ...result,
+    data: {
+      ...raw,
+      user: raw.usuario_id
+        ? {
+            id: raw.usuario_id,
+            username: raw.username,
+            email,
+            phone,
+            verificado: raw.verificado,
+          }
+        : raw.user ?? null,
+      token: raw.token ?? raw.access_token ?? null,
+      verifyBy: raw.verifyBy ?? requestPayload.verifyBy,
+    },
+  };
 }
