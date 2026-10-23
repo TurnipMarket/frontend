@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import SealMark from '../components/SealMark';
 import { verifyCode } from '../lib/verifyClient';
 import { useAuth } from '../context/AuthContext';
+import { AuthLayout } from '../components/auth/AuthLayout.jsx';
+import { MockPayload } from '../components/auth/MockDebug.jsx';
 import './LoginPage.css';
 import './VerifyAccountPage.css';
 
@@ -13,11 +14,24 @@ const CHANNEL_LABELS = {
   discord: 'tu cuenta de Discord',
 };
 
+const BRAND = {
+  title: 'Verificá tu',
+  highlight: 'cuenta',
+  tagline:
+    'Te enviamos un código de confirmación. Ingresalo para completar el registro.',
+  features: [
+    'El código expira en unos minutos',
+    'Revisá la bandeja de entrada o spam',
+    'Sin verificación no podés publicar',
+  ],
+};
+
 export default function VerifyAccountPage() {
   const { pendingVerification, setPendingVerification, user } = useAuth();
   const [code, setCode] = useState('');
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
   const [feedback, setFeedback] = useState(null);
+  const [lastPayload, setLastPayload] = useState(null);
   const inputRef = useRef(null);
 
   const channel = pendingVerification?.channel || 'email';
@@ -53,6 +67,8 @@ export default function VerifyAccountPage() {
         channel,
       });
 
+      setLastPayload(result.requestPayload);
+
       if (result.ok) {
         setStatus('success');
         setFeedback(result.data?.message ?? 'Cuenta verificada correctamente.');
@@ -81,36 +97,8 @@ export default function VerifyAccountPage() {
   }
 
   return (
-    <div className="login-shell">
-      <section className="login-brand" aria-hidden={false}>
-        <div className="login-brand__inner">
-          <SealMark />
-          <h1 className="login-brand__title">
-            Verificá tu
-            <br />
-            <em>cuenta</em>
-          </h1>
-          <p className="login-brand__tagline">
-            Te enviamos un código de confirmación a {CHANNEL_LABELS[channel]}.
-            Ingresalo para completar el registro.
-          </p>
-
-          <ul className="login-brand__features">
-            <li>
-              <span className="dot" /> El código expira en unos minutos
-            </li>
-            <li>
-              <span className="dot" /> Revisá la bandeja de entrada o spam
-            </li>
-            <li>
-              <span className="dot" /> Sin verificación no podés publicar
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <section className="login-panel">
-        <div className="login-card">
+    <AuthLayout brand={BRAND}>
+      <div className="login-card">
           <header className="login-card__header">
             <h2>Código de verificación</h2>
             <p>
@@ -160,8 +148,12 @@ export default function VerifyAccountPage() {
           <p className="signup-hint">
             <a href="#/registro">← Volver al registro</a>
           </p>
-        </div>
-      </section>
-    </div>
+
+          <MockPayload
+            payload={lastPayload}
+            summary="Ver JSON que se enviaría (modo sin backend)"
+          />
+      </div>
+    </AuthLayout>
   );
 }

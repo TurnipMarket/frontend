@@ -132,6 +132,13 @@
   line-height: 1.5;
 }
 
+/* ── Product grid (catálogo y perfil) ── */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
 /* ── Loading Spinner ── */
 .loading-spinner {
   display: flex;

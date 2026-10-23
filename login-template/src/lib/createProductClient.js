@@ -3,8 +3,44 @@ import {
   CREATE_PRODUCT_ENDPOINT,
   MOCK_MODE,
 } from '../config';
-import { extractMessage } from './apiResponse';
-import { authHeaders } from './http';
+import { simulateLatency } from './delay';
+import { authHeaders, originMeta, postJson, requestJson } from './http';
+
+/**
+ * pick(obj, keys, fallback)
+ *
+ * Devuelve el primer valor definido de una lista de nombres posibles.
+ * Sirve para aceptar los alias de campo que puede mandar el backend.
+ */
+function pick(obj, keys, fallback = null) {
+  for (const key of keys) {
+    if (obj?.[key] != null) return obj[key];
+  }
+  return fallback;
+}
+
+/**
+ * mapProduct(product, raw)
+ *
+ * Normaliza un producto aceptando los nombres de campo en inglés y en
+ * español, tanto anidados como a nivel raíz.
+ */
+function mapProduct(product, raw = {}) {
+  return {
+    id: pick(product, ['id', 'product_id'], raw.id),
+    title: pick(product, ['title', 'titulo'], raw.title),
+    description: pick(product, ['description', 'descripcion'], raw.description),
+    category: pick(product, ['category', 'categoria'], raw.category),
+    price: pick(product, ['price', 'precio'], raw.price),
+    currency: pick(product, ['currency', 'moneda'], raw.currency),
+    condition: pick(product, ['condition', 'condicion'], raw.condition),
+    image: pick(product, ['image', 'imagen'], raw.image),
+    seller_id: pick(product, ['seller_id', 'vendedor_id'], raw.seller_id),
+    status: pick(product, ['status', 'estado'], raw.status),
+    created_at: pick(product, ['created_at', 'creado_en'], raw.created_at),
+    updated_at: pick(product, ['updated_at', 'actualizado_en'], raw.updated_at),
+  };
+}
 
 /**
  * createProduct(payload)
@@ -44,22 +80,17 @@ export async function createProduct({
     image: image || null, // base64 o null
     metadata: {
       client: {
-        origin: typeof window !== 'undefined' ? window.location.origin : 'local',
-        timestamp: new Date().toISOString(),
+        ...originMeta().client,
         userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'unknown',
       },
     },
   };
 
   if (MOCK_MODE) {
-    // Simular latencia diferente a login/registro
     await simulateLatency(800, 1200);
 
-    // Mock: Simular algunos escenarios
-    const randomFail = Math.random();
-
     // 90% de éxito, 10% de conflicto
-    if (randomFail < 0.1) {
+    if (Math.random() < 0.1) {
       return {
         ok: false,
         status: 409,
@@ -71,9 +102,7 @@ export async function createProduct({
       };
     }
 
-    // Éxito: devolver datos simulados del producto creado
     const mockProductId = `prod_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const mockUserId = 'user_123'; // Simular que viene del context
 
     return {
       ok: true,
@@ -88,8 +117,8 @@ export async function createProduct({
           price,
           currency,
           condition,
-          image: image ? 'https://example.com/products/' + mockProductId + '.jpg' : null,
-          seller_id: mockUserId,
+          image: image ? `https://example.com/products/${mockProductId}.jpg` : null,
+          seller_id: 'user_123',
           status: 'published',
           views: 0,
           likes: 0,
@@ -105,61 +134,29 @@ export async function createProduct({
     };
   }
 
-  // Modo real: hacer POST al backend
-  let response;
-  try {
-    response = await fetch(`${API_BASE_URL}${CREATE_PRODUCT_ENDPOINT}`, {
-      method: 'POST',
-      headers: authHeaders(token),
-      body: JSON.stringify(requestPayload),
-    });
-  } catch (err) {
-    return {
-      ok: false,
-      status: 0,
-      data: { message: 'No se pudo conectar con el servidor.' },
-      requestPayload,
-    };
-  }
+  const result = await postJson(`${API_BASE_URL}${CREATE_PRODUCT_ENDPOINT}`, requestPayload, {
+    token,
+    successMessage: 'Producto publicado.',
+    failureMessage: 'No pudimos publicar tu producto.',
+  });
 
-  let raw = null;
-  try {
-    raw = await response.json();
-  } catch {
-    raw = null;
-  }
+  if (!result.ok || !result.data) return result;
 
-  const data = raw
-    ? {
-        message: extractMessage(raw, response.ok ? 'Producto publicado.' : 'No pudimos publicar tu producto.'),
-        product: raw.product
-          ? {
-              id: raw.product.id || raw.product_id,
-              title: raw.product.title || raw.titulo,
-              description: raw.product.description || raw.descripcion,
-              category: raw.product.category || raw.categoria,
-              price: raw.product.price || raw.precio,
-              currency: raw.product.currency || raw.moneda,
-              condition: raw.product.condition || raw.condicion,
-              image: raw.product.image || raw.imagen,
-              seller_id: raw.product.seller_id || raw.vendedor_id,
-              status: raw.product.status || raw.estado,
-              created_at: raw.product.created_at || raw.creado_en,
-              updated_at: raw.product.updated_at || raw.actualizado_en,
-            }
-          : null,
-        verification: raw.verification ? { ...raw.verification } : null,
-      }
-    : null;
-
-  return { ok: response.ok, status: response.status, data, requestPayload };
+  const raw = result.data;
+  return {
+    ...result,
+    data: {
+      ...raw,
+      product: raw.product ? mapProduct(raw.product, raw) : null,
+      verification: raw.verification ? { ...raw.verification } : null,
+    },
+  };
 }
 
 /**
  * fetchUserProducts(token)
  *
  * Obtiene la lista de productos publicados por el usuario autenticado.
- * Útil para mostrar "Mis productos" en una página.
  *
  * @param {string|null} token - Token de sesión (Authorization: Bearer).
  */
@@ -205,28 +202,10 @@ export async function fetchUserProducts(token = null) {
     };
   }
 
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/products/user`, {
-      method: 'GET',
-      headers: authHeaders(token),
-    });
-
-    let data = null;
-    try {
-      data = await response.json();
-    } catch {
-      data = null;
-    }
-
-    return { ok: response.ok, status: response.status, data, offline: false };
-  } catch {
-    return {
-      ok: false,
-      status: 0,
-      data: { error: 'network_error', message: 'No se pudo conectar con el servidor.' },
-      offline: true,
-    };
-  }
+  return requestJson(`${API_BASE_URL}/api/products/user`, {
+    method: 'GET',
+    headers: authHeaders(token),
+  });
 }
 
 /**
@@ -237,12 +216,7 @@ export async function fetchUserProducts(token = null) {
 export async function updateProduct(productId, updates) {
   const requestPayload = {
     ...updates,
-    metadata: {
-      client: {
-        origin: typeof window !== 'undefined' ? window.location.origin : 'local',
-        timestamp: new Date().toISOString(),
-      },
-    },
+    metadata: { client: originMeta().client },
   };
 
   if (MOCK_MODE) {
@@ -258,29 +232,11 @@ export async function updateProduct(productId, updates) {
     };
   }
 
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/products/${productId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestPayload),
-    });
-
-    let data = null;
-    try {
-      data = await response.json();
-    } catch {
-      data = null;
-    }
-
-    return { ok: response.ok, status: response.status, data, requestPayload };
-  } catch {
-    return {
-      ok: false,
-      status: 0,
-      data: { message: 'No se pudo conectar con el servidor.' },
-      requestPayload,
-    };
-  }
+  return requestJson(`${API_BASE_URL}/api/products/${productId}`, {
+    method: 'PATCH',
+    headers: authHeaders(null),
+    body: JSON.stringify(requestPayload),
+  });
 }
 
 /**
@@ -298,25 +254,8 @@ export async function deleteProduct(productId) {
     };
   }
 
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/products/${productId}`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    const data = response.status === 204 ? null : await response.json().catch(() => null);
-
-    return { ok: response.ok, status: response.status, data };
-  } catch {
-    return {
-      ok: false,
-      status: 0,
-      data: { message: 'No se pudo conectar con el servidor.' },
-    };
-  }
-}
-
-function simulateLatency(min = 400, max = 800) {
-  const ms = min + Math.random() * (max - min);
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return requestJson(`${API_BASE_URL}/api/products/${productId}`, {
+    method: 'DELETE',
+    headers: authHeaders(null),
+  });
 }

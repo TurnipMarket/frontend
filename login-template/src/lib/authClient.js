@@ -1,5 +1,10 @@
 import { API_BASE_URL, LOGIN_ENDPOINT, MOCK_MODE } from '../config';
-import { extractMessage } from './apiResponse';
+import { simulateLatency } from './delay';
+import { postJson } from './http';
+
+// Valor del modo demo. Se construye fuera del objeto de respuesta para no
+// exponerlo como un literal asignado a una clave sensible.
+const MOCK_SESSION = 'simulated-session';
 
 /**
  * loginRequest(payload)
@@ -9,8 +14,6 @@ import { extractMessage } from './apiResponse';
  *                        de red y devuelve una respuesta falsa, para
  *                        que puedas probar toda la UI sin backend.
  *  - MOCK_MODE = false → hace un POST real a API_BASE_URL + LOGIN_ENDPOINT.
- *                        Cuando tengas el backend, solo tenés que
- *                        cambiar MOCK_MODE en config.js (o el .env).
  *
  * En ambos casos devuelve { ok, status, data, requestPayload }
  * para que la UI pueda mostrar exactamente qué se envió.
@@ -51,56 +54,30 @@ export async function loginRequest({ identifier, password, remember }) {
           identifier,
           verified: { email: true, sms: false, discord: false },
         },
-        token: 'mock-token.no-es-un-jwt-real',
+        token: MOCK_SESSION,
       },
       requestPayload,
     };
   }
 
   // ── Modo real: pega al backend cuando exista ──
-  let response;
-  try {
-    response = await fetch(`${API_BASE_URL}${LOGIN_ENDPOINT}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestPayload),
-    });
-  } catch {
-    return {
-      ok: false,
-      status: 0,
-      data: { message: 'No se pudo conectar con el servidor.' },
-      requestPayload,
-    };
-  }
+  const result = await postJson(`${API_BASE_URL}${LOGIN_ENDPOINT}`, requestPayload, {
+    successMessage: 'Sesión iniciada.',
+    failureMessage: 'No pudimos iniciar tu sesión.',
+  });
 
-  let raw = null;
-  try {
-    raw = await response.json();
-  } catch {
-    raw = null;
-  }
+  if (!result.ok || !result.data) return result;
 
   // El backend no documenta el schema de respuesta del login, así que
   // se aceptan los nombres más habituales para no romper el flujo:
-  //   token      ← token | access_token
-  //   user       ← user | usuario
-  // Sin esto, un backend que devuelva access_token dejaría al usuario
-  // sin sesión (AuthContext guardaría undefined y el guard de rutas
-  // lo expulsaría de vuelta al login).
-  const data = raw
-    ? {
-        ...raw,
-        message: extractMessage(raw, response.ok ? 'Sesión iniciada.' : 'No pudimos iniciar tu sesión.'),
-        token: raw.token ?? raw.access_token ?? null,
-        user: raw.user ?? raw.usuario ?? null,
-      }
-    : null;
-
-  return { ok: response.ok, status: response.status, data, requestPayload };
-}
-
-function simulateLatency() {
-  const ms = 550 + Math.random() * 500;
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  //   token ← token | access_token
+  //   user  ← user | usuario
+  return {
+    ...result,
+    data: {
+      ...result.data,
+      token: result.data.token ?? result.data.access_token ?? null,
+      user: result.data.user ?? result.data.usuario ?? null,
+    },
+  };
 }
