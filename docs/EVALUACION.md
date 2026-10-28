@@ -1,20 +1,20 @@
 <!-- evaluacion:inicio -->
 # Evaluación — TurnipMarket/frontend
 
-> Documento **generado automáticamente** por la cátedra de Programación III (RepoSense + análisis de calidad). **No editar a mano**: se regenera en cada evaluación.
+> Documento **generado automáticamente** por la cátedra de Programación III (RepoSense + análisis de calidad + constancia). **No editar a mano**: se regenera en cada evaluación.
 > Rama evaluada: `main`. Análisis **heurístico** (regex + métricas): es una criba para orientar la revisión, **no una nota**.
-> Generado: 2026-10-17.
+> Generado: 2026-10-28.
 
 ## 1. Veredicto
 
 | Aspecto | Resultado |
 |---|---|
 | Tipo de proyecto | frontend |
-| Índice de calidad de servicios | **5/100** (mínimo 60) |
-| Criterios cumplidos | **10/15** |
+| Índice de calidad de servicios | **8/100** (mínimo 60) |
+| Criterios cumplidos | **11/15** |
 | Aprobado (semáforo) | **NO** |
-| Código (LOC) | 4,571 |
-| Archivos de código | 60 |
+| Código (LOC) | 4,520 |
+| Archivos de código | 68 |
 | Capas detectadas | vistas, servicios, estado |
 | Tope por duplicación | `DUP>=15%` → índice ≤ 50 |
 
@@ -24,11 +24,21 @@
 
 | Autor | Commits | Código (LOC) | Tests (LOC) | Docs (LOC) | Días activos | % del código |
 |---|---:|---:|---:|---:|---:|---:|
-| Candelaetec | 11 | 7,629 | 273 | 102 | 10 | 100% |
+| Candelaetec | 12 | 7,133 | 273 | 102 | 11 | 100% |
 
 > _El LOC de autoría lo calcula RepoSense sobre el historial y puede diferir del LOC de código del análisis de calidad (que mira solo el estado de `main`)._
 
-## 3. Aspectos evaluados
+## 3. Constancia (IC) — todas las ramas
+
+> El IC mide **cuándo** se trabajó (sesiones por semana, pausas y recencia), no cuánto ni con qué calidad. Se calcula sobre **todas las ramas** de todos los repositorios del alumno, no sólo `main`.
+
+| Alumno | Sesiones | Cumplimiento | Pausa | Recencia | IC | Nivel | Para subir de nivel |
+|---|--:|--:|--:|--:|--:|--|--|
+| Candelaetec | 11 | 51% | 23 d | 64% | **42** | No aprueba | Pausa 23 d (máx. 10 d) |
+
+> Para aprobar el IC: **2 sesiones por semana** sostenidas, sin pausas mayores a **10 días** y con actividad en las **últimas 2 semanas**. Se excluyen merges, bots y al docente. Zona horaria UTC-3.
+
+## 4. Aspectos evaluados
 
 Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuando el resultado está en rojo, se agregan preguntas para **investigar la causa** (no hay recetas: entender el porqué es parte de la evaluación).
 
@@ -36,7 +46,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Un resumen numérico (0-100) que combina todas las señales y métricas del análisis, con topes duros por duplicación.
 - **Por qué importa:** Ordena y prioriza la revisión: un índice bajo indica varias señales que conviene mirar juntas.
-- **Tu resultado:** índice **5/100** _(mínimo 60)_
+- **Tu resultado:** índice **8/100** _(mínimo 60)_
 - **Para investigar la causa:**
     - ¿En qué momento del proyecto se concentraron los problemas (arranque, integración de partes, cierre)?
     - ¿El índice bajó por muchas señales chicas o por una o dos graves?
@@ -46,21 +56,17 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Porcentaje de bloques de código repetidos (similitud) en el repositorio.
 - **Por qué importa:** Cada copia se mantiene por separado: un arreglo hay que repetirlo y los defectos se multiplican.
-- **Tu resultado:** **23.0%** de duplicación _(máximo 15%)_
+- **Tu resultado:** **17.3%** de duplicación _(máximo 15%)_
 - **Para investigar la causa:**
     - ¿El trabajo se repartió por pantallas o archivos y se integró copiando y pegando bloques?
     - ¿Qué zonas del sistema cambiaron juntas más de una vez (señal de lógica compartida)?
     - ¿Hubo un lugar común acordado para la lógica repetida antes de empezar, o cada integrante resolvió lo suyo?
 
-### 3. Secretos hardcodeados (SEC) — A REVISAR
+### 3. Secretos hardcodeados (SEC) — OK
 
 - **Qué mide:** Credenciales, tokens o claves escritos directamente en el código en vez de leerse de variables de entorno.
 - **Por qué importa:** Un secreto en el repositorio queda expuesto en el historial aunque luego se borre, y compromete al servicio y a sus usuarios.
-- **Tu resultado:** **4** secreto(s) hardcodeado(s) _(máximo 0)_
-- **Para investigar la causa:**
-    - ¿De dónde salió ese valor: un ejemplo, una prueba rápida, una copia de un compañero?
-    - ¿En qué momento entró al código y por qué no se sacó antes de cerrar la tarea?
-    - ¿Se acordó cómo manejar credenciales antes de empezar, o se postergó para el final?
+- **Tu resultado:** **0** secreto(s) hardcodeado(s) _(máximo 0)_
 
 ### 4. Consultas SQL por concatenación (SQL) — OK
 
@@ -96,7 +102,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Componentes de UI muy extensos, que suelen mezclar render, estado y lógica.
 - **Por qué importa:** Son difíciles de leer, probar y reutilizar, y sus cambios tienen efectos inesperados.
-- **Tu resultado:** **5** componente(s) demasiado grande(s) _(máximo 1)_
+- **Tu resultado:** **4** componente(s) demasiado grande(s) _(máximo 1)_
 - **Para investigar la causa:**
     - ¿El componente creció a medida que se agregaban requisitos, sin volver a dividirlo?
     - ¿Mezcla responsabilidades distintas (mostrar, calcular, pedir datos)?
@@ -112,7 +118,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Complejidad ciclomática: cantidad de caminos posibles dentro de una función (condicionales, bucles, casos).
 - **Por qué importa:** Muchos caminos = difícil de seguir y de probar; suelen esconderse casos sin cubrir.
-- **Tu resultado:** **30** bloque(s) de complejidad alta _(máximo 5 por 1000 LOC (tenés 4571 LOC))_
+- **Tu resultado:** **26** bloque(s) de complejidad alta _(máximo 5 por 1000 LOC (tenés 4520 LOC))_
 - **Para investigar la causa:**
     - ¿Se agregaron condiciones a medida que aparecían casos nuevos?
     - ¿Se probaron todos los caminos o solo el caso principal?
@@ -122,7 +128,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Tamaño de las funciones/métodos y cantidad de parámetros.
 - **Por qué importa:** Una función que hace varias cosas cuesta leerla, nombrarla y reutilizarla.
-- **Tu resultado:** **26** función/método(s) largos o con muchos parámetros _(máximo 10 por 1000 LOC)_
+- **Tu resultado:** **25** función/método(s) largos o con muchos parámetros _(máximo 10 por 1000 LOC)_
 
 ### 13. Acoplamiento alto (Acop) — OK
 
@@ -140,19 +146,26 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Cantidad de vistas/componentes de pantalla del frontend.
 - **Por qué importa:** El frontend se mide por pantallas: pocas vistas sugiere poca cobertura de la interfaz pedida.
-- **Tu resultado:** **36** vista(s)/componente(s) _(mínimo 8)_
+- **Tu resultado:** **40** vista(s)/componente(s) _(mínimo 8)_
 
-## 4. Anexo: dónde mirar
+## 5. Qué falta para aprobar
+
+Criterios que hoy están en rojo y qué habría que cambiar para alcanzar el nivel de aprobación (perfil `exigente`):
+
+| Criterio | Resultado actual | Meta | Qué arreglar |
+|---|---|---|---|
+| Índice de calidad de servicios (indice) | índice **8/100** | mínimo 60 | Subir el índice a ≥60 corrigiendo primero las señales de más peso: duplicación, secretos, SQL y capas. |
+| Duplicación (DRY) (duplicacion) | **17.3%** de duplicación | máximo 15% | Unificar los bloques repetidos en un módulo o función compartida; apuntar a ≤15%. |
+| Componente demasiado grande (BigC) | **4** componente(s) demasiado grande(s) | máximo 1 | Dividir el componente por responsabilidad en subcomponentes; ≤1 componente grande. |
+| Complejidad alta (Compl) | **26** bloque(s) de complejidad alta | máximo 5 por 1000 LOC (tenés 4520 LOC) | Extraer ramas y reglas a funciones con nombre propio; ≤5 bloques por 1000 LOC. |
+
+> Empezá por las señales de seguridad (**SEC**, **SQL**) y por la **duplicación**: son las que más pesan en el índice y las más rápidas de verificar a ojo.
+
+## 6. Anexo: dónde mirar
 
 Archivos donde el análisis encontró cada señal en rojo (sin número de línea, a propósito):
 
-**Secretos hardcodeados (SEC)** — 3 archivo(s):
-- `login-template/src/context/AuthContext.jsx`
-- `login-template/src/lib/authClient.js`
-- `login-template/src/lib/validationConstants.js`
-
-**Componente demasiado grande (BigC)** — 5 archivo(s):
-- `login-template/src/context/AuthContext.jsx`
+**Componente demasiado grande (BigC)** — 4 archivo(s):
 - `login-template/src/context/ChatContext.jsx`
 - `login-template/src/pages/CreateProductPage.jsx`
 - `login-template/src/pages/LoginPage.jsx`
@@ -160,18 +173,18 @@ Archivos donde el análisis encontró cada señal en rojo (sin número de línea
 
 **Complejidad alta (Compl)** — 16 archivo(s):
 - `login-template/src/App.jsx`
-- `login-template/src/context/AuthContext.jsx`
 - `login-template/src/context/ChatContext.jsx`
+- `login-template/src/hooks/useProductCatalog.js`
 - `login-template/src/hooks/useProductForm.js`
 - `login-template/src/lib/apiResponse.js`
+- `login-template/src/lib/authStorage.js`
 - `login-template/src/lib/chatClient.js`
 - `login-template/src/lib/formatters.js`
 - `login-template/src/lib/routes.js`
+- `login-template/src/lib/sessionExpiry.js`
 - `login-template/src/pages/CreateProductPage.jsx`
-- `login-template/src/pages/HomePage.jsx`
 - `login-template/src/pages/LoginPage.jsx`
 - `login-template/src/pages/MessagesPage.jsx`
-- `login-template/src/pages/ProfilePage.jsx`
 - `login-template/src/pages/RegisterPage.jsx`
 - `login-template/src/pages/VerifyAccountPage.jsx`
 - `login-template/src/useAvailability.js`
