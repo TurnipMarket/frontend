@@ -1,13 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { loginRequest } from '../lib/authClient';
-import { useAuth } from '../context/AuthContext';
-import { AUTH_PROVIDERS } from '../config';
 import { parseHash, safeNext } from '../lib/routes';
 import { AuthLayout } from '../components/auth/AuthLayout.jsx';
 import { MockPayload, MockBanner } from '../components/auth/MockDebug.jsx';
+import { LoginForm } from './LoginForm.jsx';
+import { LoginProviders } from './LoginProviders.jsx';
 import './LoginPage.css';
-
-const initialForm = { identifier: '', password: '', remember: false };
 
 const BRAND = {
   title: 'Contactos',
@@ -22,43 +19,11 @@ const BRAND = {
 };
 
 export default function LoginPage() {
-  const { login } = useAuth();
-  // Si el usuario fue rebotado desde una ruta protegida, el destino
-  // original viene en ?next=. Solo se aceptan rutas internas conocidas.
   const nextPath = useMemo(() => safeNext(parseHash().params), []);
   const needsAuthNotice = nextPath !== '#/';
-  const [form, setForm] = useState(initialForm);
-  const [status, setStatus] = useState('idle'); // idle | loading | success | error
+  const [status, setStatus] = useState('idle');
   const [feedback, setFeedback] = useState(null);
   const [lastPayload, setLastPayload] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
-
-  function updateField(field, value) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setStatus('loading');
-    setFeedback(null);
-
-    try {
-      const result = await loginRequest(form);
-      setLastPayload(result.requestPayload);
-
-      if (result.ok) {
-        login(result.data);
-        setStatus('success');
-        setFeedback(result.data?.message ?? 'Listo.');
-      } else {
-        setStatus('error');
-        setFeedback(result.data?.message ?? 'No pudimos iniciar tu sesión.');
-      }
-    } catch {
-      setStatus('error');
-      setFeedback('Error de conexión con el servidor.');
-    }
-  }
 
   useEffect(() => {
     if (status === 'success') {
@@ -68,11 +33,6 @@ export default function LoginPage() {
       return () => clearTimeout(timer);
     }
   }, [status, nextPath]);
-
-  function handleProviderClick(providerId) {
-    setStatus('idle');
-    setFeedback(`El acceso con "${providerId}" se conecta cuando exista el backend.`);
-  }
 
   return (
     <AuthLayout brand={BRAND}>
@@ -87,87 +47,16 @@ export default function LoginPage() {
           )}
         </header>
 
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="field">
-            <label htmlFor="identifier">Email o teléfono</label>
-            <input
-              id="identifier"
-              name="identifier"
-              type="text"
-              autoComplete="username"
-              placeholder="vos@ejemplo.com"
-              value={form.identifier}
-              onChange={(e) => updateField('identifier', e.target.value)}
-              required
-            />
-          </div>
+        <LoginForm
+          status={status}
+          setStatus={setStatus}
+          feedback={feedback}
+          setFeedback={setFeedback}
+          lastPayload={lastPayload}
+          setLastPayload={setLastPayload}
+        />
 
-          <div className="field">
-            <label htmlFor="password">Contraseña</label>
-            <div className="password-wrap">
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="current-password"
-                placeholder="••••••••"
-                value={form.password}
-                onChange={(e) => updateField('password', e.target.value)}
-                required
-                minLength={4}
-              />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword((s) => !s)}
-                aria-pressed={showPassword}
-              >
-                {showPassword ? 'Ocultar' : 'Mostrar'}
-              </button>
-            </div>
-          </div>
-
-          <div className="field-row">
-            <label className="checkbox">
-              <input
-                type="checkbox"
-                checked={form.remember}
-                onChange={(e) => updateField('remember', e.target.checked)}
-              />
-              Recordarme
-            </label>
-            <a className="link-muted" href="#recuperar">
-              ¿Olvidaste tu contraseña?
-            </a>
-          </div>
-
-          <button type="submit" className="submit-btn" disabled={status === 'loading' || status === 'success'}>
-            {status === 'loading' ? 'Entrando…' : status === 'success' ? '¡Listo!' : 'Entrar'}
-          </button>
-
-          {feedback && (
-            <p className={`feedback feedback--${status}`} role="status">
-              {feedback}
-            </p>
-          )}
-        </form>
-
-        <div className="divider">
-          <span>o continuá con</span>
-        </div>
-
-        <div className="providers">
-          {AUTH_PROVIDERS.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              className="provider-btn"
-              onClick={() => handleProviderClick(p.id)}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
+        <LoginProviders setStatus={setStatus} setFeedback={setFeedback} />
 
         <p className="signup-hint">
           ¿No tenés cuenta? <a href="#/registro">Registrate</a>
