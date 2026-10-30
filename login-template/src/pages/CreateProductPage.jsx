@@ -34,9 +34,38 @@ export default function CreateProductPage() {
     logout();
   }, [logout]);
 
+  function buildProductPayload() {
+    return {
+      title: form.title.trim(),
+      description: form.description.trim(),
+      category: form.category,
+      price: Number(form.price),
+      currency: form.currency,
+      condition: form.condition,
+      image: form.imagePreview,
+    };
+  }
+
+  function handleSuccess(result) {
+    setStatus('success');
+    setFeedback(result.data?.message ?? 'Producto publicado.');
+
+    setTimeout(() => {
+      resetForm();
+      setStatus('idle');
+      setFeedback(null);
+      setLastPayload(null);
+    }, 1500);
+  }
+
+  function handleFailure(result) {
+    setStatus('error');
+    setFeedback(result.data?.message ?? 'No pudimos publicar tu producto.');
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
-    
+
     markAllTouched();
 
     if (!isFormValid) {
@@ -49,32 +78,15 @@ export default function CreateProductPage() {
     setFeedback(null);
 
     try {
-      const result = await createProduct({
-        title: form.title.trim(),
-        description: form.description.trim(),
-        category: form.category,
-        price: Number(form.price),
-        currency: form.currency,
-        condition: form.condition,
-        image: form.imagePreview,
-      }, token);
+      const result = await createProduct(buildProductPayload(), token);
 
       setLastPayload(result.requestPayload);
 
       if (result.ok) {
-        setStatus('success');
-        setFeedback(result.data?.message ?? 'Producto publicado.');
-        
-        setTimeout(() => {
-          resetForm();
-          setStatus('idle');
-          setFeedback(null);
-          setLastPayload(null);
-        }, 1500);
-      } else {
-        setStatus('error');
-        setFeedback(result.data?.message ?? 'No pudimos publicar tu producto.');
+        handleSuccess(result);
+        return;
       }
+      handleFailure(result);
     } catch {
       setStatus('error');
       setFeedback('Error de conexión con el servidor.');

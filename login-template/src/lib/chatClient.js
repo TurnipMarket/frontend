@@ -16,21 +16,25 @@ function normalizeList(items, normalize) {
   return items.map(normalize).filter(Boolean);
 }
 
+function hasValidMessageFields(message) {
+  const text = message.text ?? message.contenido;
+  const sender = message.sender ?? message.senderUsername;
+  const createdAt = message.createdAt ?? message.created_at;
+  return (
+    message.id != null &&
+    typeof text === 'string' &&
+    typeof sender === 'string' &&
+    Boolean(createdAt)
+  );
+}
+
 function normalizeMessage(message, conversationId) {
   if (!message || typeof message !== 'object') return null;
+  if (!hasValidMessageFields(message)) return null;
 
   const text = message.text ?? message.contenido;
   const sender = message.sender ?? message.senderUsername;
   const createdAt = message.createdAt ?? message.created_at;
-
-  if (
-    message.id == null ||
-    typeof text !== 'string' ||
-    typeof sender !== 'string' ||
-    !createdAt
-  ) {
-    return null;
-  }
 
   return {
     ...message,
@@ -45,11 +49,9 @@ function normalizeMessage(message, conversationId) {
 
 function normalizeConversation(conversation) {
   if (!conversation || typeof conversation !== 'object') return null;
-
   if (conversation.id == null) return null;
 
   const { buyer, seller } = conversation;
-
   if (typeof buyer !== 'string' || typeof seller !== 'string') {
     return null;
   }

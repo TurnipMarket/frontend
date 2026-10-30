@@ -18,6 +18,17 @@ export function LoginForm({
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
+  function handleLoginSuccess(result) {
+    login(result.data);
+    setStatus('success');
+    setFeedback(result.data?.message ?? 'Listo.');
+  }
+
+  function handleLoginFailure(result) {
+    setStatus('error');
+    setFeedback(result.data?.message ?? 'No pudimos iniciar tu sesión.');
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setStatus('loading');
@@ -28,13 +39,10 @@ export function LoginForm({
       setLastPayload(result.requestPayload);
 
       if (result.ok) {
-        login(result.data);
-        setStatus('success');
-        setFeedback(result.data?.message ?? 'Listo.');
-      } else {
-        setStatus('error');
-        setFeedback(result.data?.message ?? 'No pudimos iniciar tu sesión.');
+        handleLoginSuccess(result);
+        return;
       }
+      handleLoginFailure(result);
     } catch {
       setStatus('error');
       setFeedback('Error de conexión con el servidor.');

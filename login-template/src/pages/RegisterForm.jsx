@@ -32,6 +32,31 @@ export function RegisterForm({
     markAllTouched,
   } = useRegisterForm();
 
+  function buildRegisterPayload() {
+    return {
+      username: form.username.trim(),
+      email: form.email.trim() || null,
+      phone: form.phone.trim() || null,
+      password: form.password,
+      verifyBy: form.verifyBy,
+    };
+  }
+
+  function handleRegisterSuccess(result) {
+    register(result.data);
+    setPendingVerification({
+      userId: result.data?.user?.id,
+      channel: form.verifyBy,
+      identifier: form.verifyBy === 'email' ? form.email.trim() : form.phone.trim(),
+    });
+    setStatus('success');
+    setFeedback(result.data?.message ?? 'Cuenta creada.');
+
+    setTimeout(() => {
+      window.location.hash = '#/verificar-cuenta';
+    }, 800);
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     markAllTouched();
@@ -46,33 +71,15 @@ export function RegisterForm({
     setFeedback(null);
 
     try {
-      const result = await registerRequest({
-        username: form.username.trim(),
-        email: form.email.trim() || null,
-        phone: form.phone.trim() || null,
-        password: form.password,
-        verifyBy: form.verifyBy,
-      });
-
+      const result = await registerRequest(buildRegisterPayload());
       setLastPayload(result.requestPayload);
 
       if (result.ok) {
-        register(result.data);
-        setPendingVerification({
-          userId: result.data?.user?.id,
-          channel: form.verifyBy,
-          identifier: form.verifyBy === 'email' ? form.email.trim() : form.phone.trim(),
-        });
-        setStatus('success');
-        setFeedback(result.data?.message ?? 'Cuenta creada.');
-
-        setTimeout(() => {
-          window.location.hash = '#/verificar-cuenta';
-        }, 800);
-      } else {
-        setStatus('error');
-        setFeedback(result.data?.message ?? 'No pudimos crear tu cuenta.');
+        handleRegisterSuccess(result);
+        return;
       }
+      setStatus('error');
+      setFeedback(result.data?.message ?? 'No pudimos crear tu cuenta.');
     } catch {
       setStatus('error');
       setFeedback('Error de conexión con el servidor.');

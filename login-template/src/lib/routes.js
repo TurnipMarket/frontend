@@ -57,6 +57,20 @@ export function loginHrefFor(path) {
   return `#/login?next=${encodeURIComponent(path)}`;
 }
 
+function getRouteKey(route) {
+  if (route === 'profile') return 'perfil';
+  if (route === 'messages') return 'mensajes';
+  return route;
+}
+
+function isValidProfileOrMessages(parsed, nextPath) {
+  if (parsed.route !== 'profile' && parsed.route !== 'messages') {
+    return false;
+  }
+  const key = `#/${getRouteKey(parsed.route)}`;
+  return Boolean(ROUTES[key]) && ROUTES[key] === parsed.route;
+}
+
 export function safeNext(params) {
   const next = params.get('next');
 
@@ -64,24 +78,24 @@ export function safeNext(params) {
     return '#/';
   }
 
+  const nextPath = next.split('?')[0];
   const parsed = parseHash(next);
 
-  if (parsed.path !== next.split('?')[0]) {
+  if (parsed.path !== nextPath) {
     return '#/';
   }
 
-  if (parsed.route === 'home' && next.split('?')[0] !== '#/') {
+  if (parsed.route === 'home' && nextPath !== '#/') {
     return '#/';
   }
 
-  if (!ROUTES[`#/${parsed.route === 'profile' ? 'perfil' : parsed.route === 'messages' ? 'mensajes' : parsed.route}`]) {
-    if (
-      parsed.route !== 'profile' &&
-      parsed.route !== 'messages'
-    ) {
-      return '#/';
-    }
+  if (ROUTES[nextPath]) {
+    return next;
   }
 
-  return next;
+  if (isValidProfileOrMessages(parsed, nextPath)) {
+    return next;
+  }
+
+  return '#/';
 }

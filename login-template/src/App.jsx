@@ -56,16 +56,18 @@ export default function App() {
   // (fail-closed: ante la duda, no se muestra).
   const blocked = !isAuthenticated && isProtectedPath(window.location.hash);
 
-  let page;
-  if (blocked) {
-    page = null;
-  } else if (route === 'register') page = <RegisterPage />;
-  else if (route === 'login') page = <LoginPage />;
-  else if (route === 'create-product') page = <CreateProductPage />;
-  else if (route === 'verify-account') page = <VerifyAccountPage />;
-  else if (route === 'profile' && username) page = <ProfilePage username={username} />;
-  else if (route === 'messages') page = <MessagesPage username={username} />;
-  else page = <HomePage />;
+  function renderPage() {
+    if (blocked) return null;
+    if (route === 'register') return <RegisterPage />;
+    if (route === 'login') return <LoginPage />;
+    if (route === 'create-product') return <CreateProductPage />;
+    if (route === 'verify-account') return <VerifyAccountPage />;
+    if (route === 'profile' && username) return <ProfilePage username={username} />;
+    if (route === 'messages') return <MessagesPage username={username} />;
+    return <HomePage />;
+  }
+
+  const page = renderPage();
 
   return (
     <ChatProvider>

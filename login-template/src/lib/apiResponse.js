@@ -7,18 +7,20 @@ const MESSAGE_KEYS = ['message', 'mensaje', 'error_description'];
  * legible. Acepta un string o el array de errores de validación de
  * FastAPI ({ loc, msg, ... }).
  */
+function formatDetailItem(item) {
+  if (!item || typeof item !== 'object') {
+    return typeof item === 'string' && item.trim() ? item : null;
+  }
+  const field = Array.isArray(item.loc)
+    ? item.loc[item.loc.length - 1]
+    : null;
+  if (field && item.msg) return `${field}: ${item.msg}`;
+  return item.msg || null;
+}
+
 function detailToMessage(detail) {
   if (Array.isArray(detail)) {
-    const parts = detail
-      .map((item) => {
-        const field = Array.isArray(item.loc)
-          ? item.loc[item.loc.length - 1]
-          : null;
-
-        return field ? `${field}: ${item.msg}` : item.msg;
-      })
-      .filter(Boolean);
-
+    const parts = detail.map(formatDetailItem).filter(Boolean);
     return parts.length ? parts.join('. ') : null;
   }
 
