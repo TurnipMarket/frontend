@@ -50,6 +50,18 @@ export function networkError(message = 'No se pudo conectar con el servidor.') {
  *
  * Hace un fetch y normaliza el resultado a { ok, status, data, offline }.
  */
+function buildErrorResponse(response, raw) {
+  return {
+    ok: false,
+    status: response.status,
+    data: {
+      error: raw?.error ?? 'request_failed',
+      message: extractMessage(raw, 'El servidor no pudo completar la solicitud.'),
+    },
+    offline: false,
+  };
+}
+
 export async function requestJson(url, options = {}) {
   let response;
 
@@ -62,15 +74,7 @@ export async function requestJson(url, options = {}) {
   const raw = await response.json().catch(() => null);
 
   if (!response.ok) {
-    return {
-      ok: false,
-      status: response.status,
-      data: {
-        error: raw?.error ?? 'request_failed',
-        message: extractMessage(raw, 'El servidor no pudo completar la solicitud.'),
-      },
-      offline: false,
-    };
+    return buildErrorResponse(response, raw);
   }
 
   return { ok: true, status: response.status, data: raw, offline: false };
@@ -82,6 +86,24 @@ export async function requestJson(url, options = {}) {
  * POST genérico con manejo de red, parseo y mensaje por defecto.
  * Devuelve { ok, status, data, requestPayload, offline }.
  */
+function buildPostError(payload) {
+  return {
+    ok: false,
+    status: 0,
+    data: { message: 'No se pudo conectar con el servidor.' },
+    requestPayload: payload,
+    offline: true,
+  };
+}
+
+function buildPostData(raw, response, successMessage, failureMessage) {
+  if (!raw) return null;
+  return {
+    ...raw,
+    message: extractMessage(raw, response.ok ? successMessage : failureMessage),
+  };
+}
+
 export async function postJson(
   url,
   payload,
@@ -96,22 +118,11 @@ export async function postJson(
       body: JSON.stringify(payload),
     });
   } catch {
-    return {
-      ok: false,
-      status: 0,
-      data: { message: 'No se pudo conectar con el servidor.' },
-      requestPayload: payload,
-      offline: true,
-    };
+    return buildPostError(payload);
   }
 
   const raw = await response.json().catch(() => null);
-  const data = raw
-    ? {
-        ...raw,
-        message: extractMessage(raw, response.ok ? successMessage : failureMessage),
-      }
-    : null;
+  const data = buildPostData(raw, response, successMessage, failureMessage);
 
   return {
     ok: response.ok,

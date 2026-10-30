@@ -6,16 +6,27 @@ export function useAvailability(field, value, { validate, debounceMs = 500 } = {
   const [status, setStatus] = useState('idle');
   const requestId = useRef(0);
 
-  useEffect(() => {
-    const trimmed = (value || '').trim();
+  function getInitialStatus(trimmed) {
+    if (!trimmed) return 'idle';
+    if (validate && !validate(trimmed)) return 'invalid';
+    return 'checking';
+  }
 
-    if (!trimmed) {
+  function applyResult(result, currentId) {
+    if (currentId !== requestId.current) return;
+    if (result.available === null) {
       setStatus('idle');
       return;
     }
+    setStatus(result.available ? 'available' : 'taken');
+  }
 
-    if (validate && !validate(trimmed)) {
-      setStatus('invalid');
+  useEffect(() => {
+    const trimmed = (value || '').trim();
+    const initial = getInitialStatus(trimmed);
+
+    if (initial === 'idle' || initial === 'invalid') {
+      setStatus(initial);
       return;
     }
 
@@ -24,13 +35,7 @@ export function useAvailability(field, value, { validate, debounceMs = 500 } = {
 
     const timer = setTimeout(async () => {
       const result = await checkAvailability({ field, value: trimmed });
-      if (currentId !== requestId.current) return; // llegó una respuesta vieja, se ignora
-
-      if (result.available === null) {
-        setStatus('idle');
-      } else {
-        setStatus(result.available ? 'available' : 'taken');
-      }
+      applyResult(result, currentId);
     }, debounceMs);
 
     return () => clearTimeout(timer);
