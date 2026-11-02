@@ -3,17 +3,17 @@
 
 > Documento **generado automáticamente** por la cátedra de Programación III (RepoSense + análisis de calidad + constancia). **No editar a mano**: se regenera en cada evaluación.
 > Rama evaluada: `main`. Análisis **heurístico** (regex + métricas): es una criba para orientar la revisión, **no una nota**.
-> Generado: 2026-10-29.
+> Generado: 2026-11-02.
 
 ## 1. Veredicto
 
 | Aspecto | Resultado |
 |---|---|
 | Tipo de proyecto | frontend |
-| Índice de calidad de servicios | **14/100** (mínimo 60) |
-| Criterios cumplidos | **12/14** |
+| Índice de calidad de servicios | **15/100** (mínimo 60) |
+| Criterios cumplidos | **13/14** |
 | Aprobado (semáforo) | **NO** |
-| Código (LOC) | 4,682 |
+| Código (LOC) | 4,735 |
 | Archivos de código | 77 |
 | Tests (archivos) | 5 |
 | Cobertura de líneas | no aplica (frontend sin herramienta de cobertura E2E) (mínimo 80%) |
@@ -25,7 +25,7 @@
 
 | Autor | Commits | Código (LOC) | Tests (LOC) | Docs (LOC) | Días activos | % del código |
 |---|---:|---:|---:|---:|---:|---:|
-| Candelaetec | 13 | 7,309 | 273 | 102 | 12 | 100% |
+| Candelaetec | 14 | 7,372 | 273 | 102 | 13 | 100% |
 
 > _El LOC de autoría lo calcula RepoSense sobre el historial y puede diferir del LOC de código del análisis de calidad (que mira solo el estado de `main`)._
 
@@ -47,7 +47,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Un resumen numérico (0-100) que combina todas las señales y métricas del análisis, con topes duros por duplicación.
 - **Por qué importa:** Ordena y prioriza la revisión: un índice bajo indica varias señales que conviene mirar juntas.
-- **Tu resultado:** índice **14/100** _(mínimo 60)_
+- **Tu resultado:** índice **15/100** _(mínimo 60)_
 - **Para investigar la causa:**
     - ¿En qué momento del proyecto se concentraron los problemas (arranque, integración de partes, cierre)?
     - ¿El índice bajó por muchas señales chicas o por una o dos graves?
@@ -57,7 +57,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Porcentaje de bloques de código repetidos (similitud) en el repositorio.
 - **Por qué importa:** Cada copia se mantiene por separado: un arreglo hay que repetirlo y los defectos se multiplican.
-- **Tu resultado:** **9.6%** de duplicación _(máximo 15%)_
+- **Tu resultado:** **9.5%** de duplicación _(máximo 15%)_
 
 ### 3. Secretos hardcodeados (SEC) — OK
 
@@ -107,21 +107,17 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 - **Por qué importa:** Una unidad que cambia por motivos distintos es frágil y cuesta entenderla.
 - **Tu resultado:** **0** unidad(es) con baja cohesión _(máximo 0)_
 
-### 11. Complejidad alta (Compl) — A REVISAR
+### 11. Complejidad alta (Compl) — OK
 
 - **Qué mide:** Complejidad ciclomática: cantidad de caminos posibles dentro de una función (condicionales, bucles, casos).
 - **Por qué importa:** Muchos caminos = difícil de seguir y de probar; suelen esconderse casos sin cubrir.
-- **Tu resultado:** **24** bloque(s) de complejidad alta _(máximo 5 por 1000 LOC (tenés 4682 LOC))_
-- **Para investigar la causa:**
-    - ¿Se agregaron condiciones a medida que aparecían casos nuevos?
-    - ¿Se probaron todos los caminos o solo el caso principal?
-    - ¿Hay reglas de negocio mezcladas con detalles técnicos?
+- **Tu resultado:** **23** bloque(s) de complejidad alta _(máximo 5 por 1000 LOC (tenés 4735 LOC))_
 
 ### 12. Funciones/métodos largos o con muchos parámetros (Tam) — OK
 
 - **Qué mide:** Tamaño de las funciones/métodos y cantidad de parámetros.
 - **Por qué importa:** Una función que hace varias cosas cuesta leerla, nombrarla y reutilizarla.
-- **Tu resultado:** **26** función/método(s) largos o con muchos parámetros _(máximo 10 por 1000 LOC)_
+- **Tu resultado:** **24** función/método(s) largos o con muchos parámetros _(máximo 10 por 1000 LOC)_
 
 ### 13. Acoplamiento alto (Acop) — OK
 
@@ -137,36 +133,17 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 ## 5. Qué falta para aprobar
 
-Criterios que hoy están en rojo y qué habría que cambiar para alcanzar el nivel de aprobación (perfil `exigente`):
+Criterios que hoy están en rojo y, para cada uno, una explicación breve de **cómo corregirlo** hasta alcanzar el nivel de aprobación (perfil `exigente`):
 
-| Criterio | Resultado actual | Meta | Qué arreglar |
+| Criterio | Resultado actual | Meta | Cómo corregirlo |
 |---|---|---|---|
-| Índice de calidad de servicios (indice) | índice **14/100** | mínimo 60 | Subir el índice a ≥60 corrigiendo primero las señales de más peso: duplicación, secretos, SQL y capas. |
-| Complejidad alta (Compl) | **24** bloque(s) de complejidad alta | máximo 5 por 1000 LOC (tenés 4682 LOC) | Extraer ramas y reglas a funciones con nombre propio; ≤5 bloques por 1000 LOC. |
+| Índice de calidad de servicios (indice) | índice **15/100** | mínimo 60 | El índice es un resumen: sube al corregir los criterios en rojo. Empezá por los de más peso (duplicación ≤15%, SEC y SQL en 0, capas ≥2) y volvé a medir; la meta es ≥60. |
 
-> Empezá por las señales de seguridad (**SEC**, **SQL**) y por la **duplicación**: son las que más pesan en el índice y las más rápidas de verificar a ojo.
+> Empezá por las señales de seguridad (**SEC**, **SQL**) y por la **duplicación**: son las que más pesan en el índice y las más rápidas de verificar a ojo. Después de corregir, volvé a correr la medición: el semáforo se recalcula sobre `main`.
 
 ## 6. Anexo: dónde mirar
 
-Archivos donde el análisis encontró cada señal en rojo (sin número de línea, a propósito):
-
-**Complejidad alta (Compl)** — 16 archivo(s):
-- `login-template/src/App.jsx`
-- `login-template/src/context/useChatActions.js`
-- `login-template/src/hooks/useProductCatalog.js`
-- `login-template/src/hooks/useProductForm.js`
-- `login-template/src/lib/apiResponse.js`
-- `login-template/src/lib/authStorage.js`
-- `login-template/src/lib/chatClient.js`
-- `login-template/src/lib/formatters.js`
-- `login-template/src/lib/routes.js`
-- `login-template/src/lib/sessionExpiry.js`
-- `login-template/src/pages/CreateProductPage.jsx`
-- `login-template/src/pages/LoginForm.jsx`
-- `login-template/src/pages/MessagesPage.jsx`
-- `login-template/src/pages/RegisterForm.jsx`
-- `login-template/src/pages/VerifyAccountPage.jsx`
-- `login-template/src/useAvailability.js`
+_No hay criterios en rojo con archivos asociados._
 
 ---
 _Informe generado por la cátedra. Los umbrales corresponden al perfil `exigente`. Ante dudas, revisá el archivo señalado y el criterio en `CRITERIOS-CALIDAD.md`._
