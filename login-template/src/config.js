@@ -1,5 +1,5 @@
-const _host = import.meta.env.VITE_BACKEND_HOST || '127.0.0.1';
-const _port = import.meta.env.VITE_BACKEND_PORT || '8000';
+const _host = import.meta.env.VITE_BACKEND_HOST || '192.168.220.135';
+const _port = import.meta.env.VITE_BACKEND_PORT || '5000';
 
 export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || `http://${_host}:${_port}`;
