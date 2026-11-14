@@ -3,7 +3,7 @@
 
 > Documento **generado automáticamente** por la cátedra de Programación III (RepoSense + análisis de calidad + constancia). **No editar a mano**: se regenera en cada evaluación.
 > Rama evaluada: `main`. Análisis **heurístico** (regex + métricas): es una criba para orientar la revisión, **no una nota**.
-> Generado: 2026-11-13.
+> Generado: 2026-11-14.
 
 ## 1. Veredicto
 
@@ -146,7 +146,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 ### Candelaetec
 
-**14/27 clases con actividad** · total del período: 15 commits · 10 merges
+**15/27 clases con actividad** · total del período: 15 commits · 10 merges
 
 | Fecha | Actividad | Repositorios | Commits / merges |
 |---|:--:|---|--:|
@@ -175,8 +175,8 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 | 2026-10-30 | **Sí** | frontend | 1 / 1 |
 | 2026-11-04 | No | sin actividad | 0 / 0 |
 | 2026-11-06 | No | sin actividad | 0 / 0 |
-| 2026-11-11 | **Sí** | frontend | 1 / 1 |
-| 2026-11-13 | No | sin actividad | 0 / 0 |
+| 2026-11-11 | **Sí** | frontend | 1 / 0 |
+| 2026-11-13 | **Sí** | frontend | 0 / 1 |
 
 **Fuera de clase:** sin actividad registrada.
 
