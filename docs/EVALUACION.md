@@ -3,7 +3,7 @@
 
 > Documento **generado automáticamente** por la cátedra de Programación III (RepoSense + análisis de calidad + constancia). **No editar a mano**: se regenera en cada evaluación.
 > Rama evaluada: `main`. Análisis **heurístico** (regex + métricas): es una criba para orientar la revisión, **no una nota**.
-> Generado: 2026-11-14.
+> Generado: 2026-11-16.
 
 ## 1. Veredicto
 
@@ -36,7 +36,7 @@
 
 | Alumno | Sesiones | Cumplimiento | Pausa | Recencia | IC | Nivel | Para subir de nivel |
 |---|--:|--:|--:|--:|--:|--|--|
-| Candelaetec | 12 | 46% | 23 d | 0% | **30** | No aprueba | Cumplimiento 46% (mín. 50%); Recencia 0% (mín. 50%) |
+| Candelaetec | 12 | 44% | 23 d | 0% | **29** | No aprueba | Cumplimiento 44% (mín. 50%); Recencia 0% (mín. 50%) |
 
 > Para aprobar el IC: **2 sesiones por semana** sostenidas, sin pausas mayores a **10 días** y con actividad en las **últimas 2 semanas**. Se excluyen merges, bots y al docente. Zona horaria UTC-3.
 
@@ -146,7 +146,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 ### Candelaetec
 
-**15/27 clases con actividad** · total del período: 15 commits · 10 merges
+**14/27 clases con actividad** · total del período: 15 commits · 9 merges
 
 | Fecha | Actividad | Repositorios | Commits / merges |
 |---|:--:|---|--:|
@@ -176,9 +176,13 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 | 2026-11-04 | No | sin actividad | 0 / 0 |
 | 2026-11-06 | No | sin actividad | 0 / 0 |
 | 2026-11-11 | **Sí** | frontend | 1 / 0 |
-| 2026-11-13 | **Sí** | frontend | 0 / 1 |
+| 2026-11-13 | No | sin actividad | 0 / 0 |
 
-**Fuera de clase:** sin actividad registrada.
+**Fuera de clase:** 1 fecha(s) con actividad · 0 commits · 1 merges
+
+| Fecha | Repositorios | Commits / merges |
+|---|---|--:|
+| 2026-11-14 | frontend | 0 / 1 |
 
 ### matiblancooo
 
