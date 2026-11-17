@@ -3,7 +3,7 @@
 
 > Documento **generado automáticamente** por la cátedra de Programación III (RepoSense + análisis de calidad + constancia). **No editar a mano**: se regenera en cada evaluación.
 > Rama evaluada: `main`. Análisis **heurístico** (regex + métricas): es una criba para orientar la revisión, **no una nota**.
-> Generado: 2026-11-16.
+> Generado: 2026-11-17.
 
 ## 1. Veredicto
 
@@ -26,7 +26,7 @@
 
 | Autor | Commits | Código (LOC) | Tests (LOC) | Docs (LOC) | Días activos | % del código |
 |---|---:|---:|---:|---:|---:|---:|
-| Candelaetec | 14 | 7,372 | 273 | 102 | 13 | 100% |
+| Candelaetec | 15 | 7,372 | 273 | 102 | 15 | 100% |
 
 > _El LOC de autoría lo calcula RepoSense sobre el historial y puede diferir del LOC de código del análisis de calidad (que mira solo el estado de `main`)._
 
@@ -182,7 +182,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 | Fecha | Repositorios | Commits / merges |
 |---|---|--:|
-| 2026-11-14 | frontend | 0 / 1 |
+| 2026-11-16 | frontend | 0 / 1 |
 
 ### matiblancooo
 
@@ -218,12 +218,13 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 | 2026-11-11 | No | sin actividad | 0 / 0 |
 | 2026-11-13 | No | sin actividad | 0 / 0 |
 
-**Fuera de clase:** 2 fecha(s) con actividad · 4 commits · 1 merges
+**Fuera de clase:** 3 fecha(s) con actividad · 6 commits · 4 merges
 
 | Fecha | Repositorios | Commits / merges |
 |---|---|--:|
 | 2026-08-27 | backend | 2 / 0 |
 | 2026-11-10 | backend | 2 / 1 |
+| 2026-11-16 | backend | 2 / 3 |
 
 ## 7. Anexo: dónde mirar
 
