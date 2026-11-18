@@ -229,25 +229,28 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 | 2026-11-16 | backend | 2 / 2 |
 | 2026-11-17 | backend | 0 / 1 |
 
-## 7. Anexo: dónde mirar
+## 7. Anexo: archivos donde se originan los problemas
 
-Archivos donde el análisis encontró cada señal en rojo (sin número de línea, a propósito):
+Se listan los archivos y líneas que el análisis marca para cada criterio en rojo. Para **duplicación** se muestran los archivos con más líneas repetidas; para **cobertura**, las unidades por debajo del umbral.
 
-**Complejidad alta (Compl)** — 13 archivo(s):
-- `login-template/src/App.jsx`
-- `login-template/src/context/useChatActions.js`
-- `login-template/src/hooks/useProductCatalog.js`
-- `login-template/src/hooks/useProductForm.js`
-- `login-template/src/lib/authStorage.js`
-- `login-template/src/lib/chatClient.js`
-- `login-template/src/lib/formatters.js`
-- `login-template/src/lib/routes.js`
-- `login-template/src/lib/sessionExpiry.js`
-- `login-template/src/pages/CreateProductPage.jsx`
-- `login-template/src/pages/MessagesPage.jsx`
-- `login-template/src/pages/RegisterForm.jsx`
-- `login-template/src/pages/VerifyAccountPage.jsx`
+**Complejidad alta (Compl)** — 23 hallazgo(s) en 13 archivo(s):
+
+| Archivo | Línea(s) | Señal |
+|---|---|---|
+| `login-template/src/App.jsx` | 22, 59 | función 'App' con complejidad 10 |
+| `login-template/src/context/useChatActions.js` | 44, 90, 133 | función 'async' con complejidad 9 |
+| `login-template/src/hooks/useProductCatalog.js` | 11, 16, 19 | función 'useProductCatalog' con complejidad 7 |
+| `login-template/src/hooks/useProductForm.js` | 8 | función 'useProductForm' con complejidad 6 |
+| `login-template/src/lib/authStorage.js` | 34 | función 'loadStoredAuth' con complejidad 7 |
+| `login-template/src/lib/chatClient.js` | 27, 31, 50 | función 'Boolean' con complejidad 7 |
+| `login-template/src/lib/formatters.js` | 52 | función 'formatRelativeTime' con complejidad 6 |
+| `login-template/src/lib/routes.js` | 16, 74 | función 'parseHash' con complejidad 7 |
+| `login-template/src/lib/sessionExpiry.js` | 39 | función 'resolveExpiry' con complejidad 9 |
+| `login-template/src/pages/CreateProductPage.jsx` | 11 | función 'CreateProductPage' con complejidad 8 |
+| `login-template/src/pages/MessagesPage.jsx` | 50 | función 'useEffect' con complejidad 7 |
+| `login-template/src/pages/RegisterForm.jsx` | 45, 60 | función 'handleRegisterSuccess' con complejidad 6 |
+| `login-template/src/pages/VerifyAccountPage.jsx` | 29, 51 | función 'VerifyAccountPage' con complejidad 17 |
 
 ---
-_Informe generado por la cátedra. Los umbrales corresponden al perfil `exigente`. Ante dudas, revisá el archivo señalado y el criterio en `CRITERIOS-CALIDAD.md`._
+_Informe generado por la cátedra. Los umbrales corresponden al perfil `exigente`. Ante dudas, revisá el archivo y la línea señalados y el criterio en `CRITERIOS-CALIDAD.md`._
 <!-- evaluacion:fin -->
