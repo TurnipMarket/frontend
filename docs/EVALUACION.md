@@ -3,7 +3,7 @@
 
 > Documento **generado automáticamente** por la cátedra de Programación III (RepoSense + análisis de calidad + constancia). **No editar a mano**: se regenera en cada evaluación.
 > Rama evaluada: `main`. Análisis **heurístico** (regex + métricas): es una criba para orientar la revisión, **no una nota**.
-> Generado: 2026-11-17.
+> Generado: 2026-11-18.
 
 ## 1. Veredicto
 
@@ -36,7 +36,7 @@
 
 | Alumno | Sesiones | Cumplimiento | Pausa | Recencia | IC | Nivel | Para subir de nivel |
 |---|--:|--:|--:|--:|--:|--|--|
-| Candelaetec | 12 | 44% | 23 d | 0% | **29** | No aprueba | Cumplimiento 44% (mín. 50%); Recencia 0% (mín. 50%) |
+| Candelaetec | 12 | 43% | 23 d | 0% | **28** | No aprueba | Cumplimiento 43% (mín. 50%); Recencia 0% (mín. 50%) |
 
 > Para aprobar el IC: **2 sesiones por semana** sostenidas, sin pausas mayores a **10 días** y con actividad en las **últimas 2 semanas**. Se excluyen merges, bots y al docente. Zona horaria UTC-3.
 
@@ -142,11 +142,11 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 ## 6. Actividad en clase y fuera de clase
 
-> Se consideran las **27 clases** del período (miércoles y viernes, según `config/constancia.json`; feriados y semanas sin clase descontados). Para cada alumno se muestra la actividad **en cada clase** y también la actividad **fuera de los días de clase** (fines de semana u otros días). `Commits` = commits de trabajo (no-merge); `Merges` = merges de PR (también son push). Los días sin actividad dicen **sin actividad**.
+> Se consideran las **28 clases** del período (miércoles y viernes, según `config/constancia.json`; feriados y semanas sin clase descontados). Para cada alumno se muestra la actividad **en cada clase** y también la actividad **fuera de los días de clase** (fines de semana u otros días). `Commits` = commits de trabajo (no-merge); `Merges` = merges de PR (también son push). Los días sin actividad dicen **sin actividad**.
 
 ### Candelaetec
 
-**14/27 clases con actividad** · total del período: 15 commits · 9 merges
+**14/28 clases con actividad** · total del período: 15 commits · 9 merges
 
 | Fecha | Actividad | Repositorios | Commits / merges |
 |---|:--:|---|--:|
@@ -177,6 +177,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 | 2026-11-06 | No | sin actividad | 0 / 0 |
 | 2026-11-11 | **Sí** | frontend | 1 / 0 |
 | 2026-11-13 | No | sin actividad | 0 / 0 |
+| 2026-11-18 | No | sin actividad | 0 / 0 |
 
 **Fuera de clase:** 1 fecha(s) con actividad · 0 commits · 1 merges
 
@@ -186,7 +187,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 ### matiblancooo
 
-**7/27 clases con actividad** · total del período: 9 commits · 7 merges
+**7/28 clases con actividad** · total del período: 9 commits · 7 merges
 
 | Fecha | Actividad | Repositorios | Commits / merges |
 |---|:--:|---|--:|
@@ -217,14 +218,16 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 | 2026-11-06 | No | sin actividad | 0 / 0 |
 | 2026-11-11 | No | sin actividad | 0 / 0 |
 | 2026-11-13 | No | sin actividad | 0 / 0 |
+| 2026-11-18 | No | sin actividad | 0 / 0 |
 
-**Fuera de clase:** 3 fecha(s) con actividad · 6 commits · 4 merges
+**Fuera de clase:** 4 fecha(s) con actividad · 6 commits · 4 merges
 
 | Fecha | Repositorios | Commits / merges |
 |---|---|--:|
 | 2026-08-27 | backend | 2 / 0 |
 | 2026-11-10 | backend | 2 / 1 |
-| 2026-11-16 | backend | 2 / 3 |
+| 2026-11-16 | backend | 2 / 2 |
+| 2026-11-17 | backend | 0 / 1 |
 
 ## 7. Anexo: dónde mirar
 
