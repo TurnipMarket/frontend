@@ -233,25 +233,52 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 ## 7. Anexo: archivos donde se originan los problemas
 
-Se listan los archivos y líneas que el análisis marca para cada criterio en rojo. Para **duplicación** se muestran los archivos con más líneas repetidas; para **cobertura**, las unidades por debajo del umbral.
+Se listan **todos** los archivos y líneas que el análisis marca para cada criterio en rojo. Para **duplicación** se muestran los archivos con líneas repetidas; para **cobertura**, las unidades por debajo del umbral.
+
+**Resumen por archivo** — archivos con más hallazgos:
+
+| Archivo | Hallazgos | Peso total | Señales |
+|---|---:|---:|---|
+| `login-template/src/context/useChatActions.js` | 6 | 27 | high_complexity, long_function |
+| `login-template/src/hooks/useProductCatalog.js` | 4 | 19 | high_complexity, long_function |
+| `login-template/src/pages/VerifyAccountPage.jsx` | 4 | 18 | high_complexity, long_function |
+| `login-template/src/App.jsx` | 3 | 14 | high_complexity, long_function |
+| `login-template/src/lib/chatClient.js` | 3 | 15 | high_complexity |
+| `login-template/src/lib/routes.js` | 3 | 14 | high_complexity, long_function |
+| `login-template/src/pages/RegisterForm.jsx` | 3 | 16 | big_component, high_complexity |
+| `login-template/src/hooks/useProductForm.js` | 2 | 9 | high_complexity, long_function |
+| `login-template/src/pages/CreateProductPage.jsx` | 2 | 9 | high_complexity, long_function |
+| `login-template/src/components/chat/ChatPanel.jsx` | 1 | 4 | long_params |
+| `login-template/src/context/useChatState.js` | 1 | 4 | long_function |
+| `login-template/src/hooks/useRegisterForm.js` | 1 | 4 | long_function |
+| `login-template/src/lib/authStorage.js` | 1 | 5 | high_complexity |
+| `login-template/src/lib/chatMock.js` | 1 | 4 | long_function |
+| `login-template/src/lib/createProductClient.js` | 1 | 4 | long_function |
+| `login-template/src/lib/formatters.js` | 1 | 5 | high_complexity |
+| `login-template/src/lib/registerClient.js` | 1 | 4 | long_params |
+| `login-template/src/lib/sessionExpiry.js` | 1 | 5 | high_complexity |
+| `login-template/src/pages/HomePage.jsx` | 1 | 4 | long_function |
+| `login-template/src/pages/LoginPage.jsx` | 1 | 4 | long_function |
+| `login-template/src/pages/MessagesPage.jsx` | 1 | 5 | high_complexity |
+| `login-template/src/pages/RegisterPage.jsx` | 1 | 4 | long_function |
 
 **Complejidad alta (Compl)** — 23 hallazgo(s) en 13 archivo(s):
 
-| Archivo | Línea(s) | Señal |
-|---|---|---|
-| `login-template/src/App.jsx` | 22, 59 | función 'App' con complejidad 10 |
-| `login-template/src/context/useChatActions.js` | 44, 90, 133 | función 'async' con complejidad 9 |
-| `login-template/src/hooks/useProductCatalog.js` | 11, 16, 19 | función 'useProductCatalog' con complejidad 7 |
-| `login-template/src/hooks/useProductForm.js` | 8 | función 'useProductForm' con complejidad 6 |
-| `login-template/src/lib/authStorage.js` | 34 | función 'loadStoredAuth' con complejidad 7 |
-| `login-template/src/lib/chatClient.js` | 27, 31, 50 | función 'Boolean' con complejidad 7 |
-| `login-template/src/lib/formatters.js` | 52 | función 'formatRelativeTime' con complejidad 6 |
-| `login-template/src/lib/routes.js` | 16, 74 | función 'parseHash' con complejidad 7 |
-| `login-template/src/lib/sessionExpiry.js` | 39 | función 'resolveExpiry' con complejidad 9 |
-| `login-template/src/pages/CreateProductPage.jsx` | 11 | función 'CreateProductPage' con complejidad 8 |
-| `login-template/src/pages/MessagesPage.jsx` | 50 | función 'useEffect' con complejidad 7 |
-| `login-template/src/pages/RegisterForm.jsx` | 45, 60 | función 'handleRegisterSuccess' con complejidad 6 |
-| `login-template/src/pages/VerifyAccountPage.jsx` | 29, 51 | función 'VerifyAccountPage' con complejidad 17 |
+| Archivo | Línea(s) | Señal | Detalle |
+|---|---|---|---|
+| `login-template/src/App.jsx` | 22, 59 | high_complexity | función 'App' con complejidad 10 |
+| `login-template/src/context/useChatActions.js` | 44, 90, 133 | high_complexity | función 'async' con complejidad 9 |
+| `login-template/src/hooks/useProductCatalog.js` | 11, 16, 19 | high_complexity | función 'useProductCatalog' con complejidad 7 |
+| `login-template/src/hooks/useProductForm.js` | 8 | high_complexity | función 'useProductForm' con complejidad 6 |
+| `login-template/src/lib/authStorage.js` | 34 | high_complexity | función 'loadStoredAuth' con complejidad 7 |
+| `login-template/src/lib/chatClient.js` | 27, 31, 50 | high_complexity | función 'Boolean' con complejidad 7 |
+| `login-template/src/lib/formatters.js` | 52 | high_complexity | función 'formatRelativeTime' con complejidad 6 |
+| `login-template/src/lib/routes.js` | 16, 74 | high_complexity | función 'parseHash' con complejidad 7 |
+| `login-template/src/lib/sessionExpiry.js` | 39 | high_complexity | función 'resolveExpiry' con complejidad 9 |
+| `login-template/src/pages/CreateProductPage.jsx` | 11 | high_complexity | función 'CreateProductPage' con complejidad 8 |
+| `login-template/src/pages/MessagesPage.jsx` | 50 | high_complexity | función 'useEffect' con complejidad 7 |
+| `login-template/src/pages/RegisterForm.jsx` | 45, 60 | high_complexity | función 'handleRegisterSuccess' con complejidad 6 |
+| `login-template/src/pages/VerifyAccountPage.jsx` | 29, 51 | high_complexity | función 'VerifyAccountPage' con complejidad 17 |
 
 ---
 _Informe generado por la cátedra. Los umbrales corresponden al perfil `exigente`. Ante dudas, revisá el archivo y la línea señalados y el criterio en `CRITERIOS-CALIDAD.md`._
